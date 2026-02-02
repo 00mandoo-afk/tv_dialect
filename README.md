@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8">ㄹ
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>TV사투리연구(가칭)</title>
@@ -504,11 +504,19 @@
   <label><input type="radio" name="gender" value="여"> 여</label>
 </td>
       </tr>
-      <tr>
-  <td class="info-label">공용공간 TV</td>
+ <tr>
+  <td class="info-label">거주지역</td>
   <td class="radio-group">
-    <label><input type="radio" name="tv_livingroom" value="있음"> 있음</label>
-    <label><input type="radio" name="tv_livingroom" value="없음"> 없음</label>
+    <label><input type="radio" name="region" value="부산"> 부산</label>
+    <label><input type="radio" name="region" value="울산"> 울산</label>
+    <label><input type="radio" name="region" value="경남"> 경남</label>
+  </td>
+</tr>
+<tr>
+  <td class="info-label">거주기간</td>
+  <td>
+    <input type="number" id="info-residence-years"
+           style="width:60px; padding:5px;" placeholder="10"> 년
   </td>
 </tr>
       <tr>
@@ -856,19 +864,21 @@
     document.querySelectorAll('.slot.occupied .q-card').forEach(c => {
       sortData += `${c.textContent.split('.')[0]}:${c.parentElement.parentElement.dataset.score}, `;
     });
+const gender = document.querySelector('input[name="gender"]:checked')?.value || "미선택";
+const region = document.querySelector('input[name="region"]:checked')?.value || '미선택';
+const residenceYears = document.getElementById('info-residence-years').value || '미입력';
+const job = document.querySelector('input[name="job"]:checked')?.value || "미선택";
+const jobEtc = document.getElementById('info-job-etc').value;
 
-    const gender = document.querySelector('input[name="gender"]:checked')?.value || "미선택";
-    const tvLivingroom = document.querySelector('input[name="tv_livingroom"]:checked')?.value || '미선택';
-    const job = document.querySelector('input[name="job"]:checked')?.value || "미선택";
-    const jobEtc = document.getElementById('info-job-etc').value;
-  const personalInfo =
+const personalInfo =
   `출생:19${document.getElementById('info-year').value} / ` +
   `성별:${gender} / ` +
-  `공용공간TV:${tvLivingroom} / ` +
+  `거주지역:${region} / ` +
+  `거주기간:${residenceYears}년 / ` +
   `직업:${job}(${jobEtc}) / ` +
   `연락처:${document.getElementById('info-phone').value} / ` +
   `가족:${document.getElementById('info-family').value}`;
-
+   
     document.getElementById('g-entry-1').value = sortData;
     document.getElementById('g-entry-2').value =
       Array.from(document.querySelectorAll('.reason-input'))
