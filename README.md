@@ -1,1 +1,978 @@
 # tv_dialect
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>TV사투리연구(가칭)</title>
+
+  <style>
+    :root {
+      --primary-color: #2c3e50;
+      --accent-color: #1e40af;
+      --disagree-color: #e74c3c;
+      --agree-color: #27ae60;
+    }
+
+    body {
+      font-family: 'Pretendard', sans-serif;
+      background: #f4f7f9;
+      margin: 0;
+      padding: 0;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    /* 두 페이지 공통 */
+    #survey-page,
+    #final-form-page {
+      display: none;
+      padding-bottom: 50px;
+    }
+    #survey-page.active,
+    #final-form-page.active {
+      display: block;
+    }
+
+    header {
+      background: white;
+      padding: 15px;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+      position: static;
+      z-index: 2000;
+    }
+    @media (max-width: 768px) {
+      header { position: static; }
+    }
+
+    .main-title {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--primary-color);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      letter-spacing: -0.3px;
+      margin-bottom: 12px;
+    }
+
+    .sub-desc {
+      font-size: 0.95rem;
+      color: #000;
+      font-weight: 500;
+      margin-top: 6px;
+      line-height: 1.4;
+      white-space: pre-line;
+    }
+
+    #question-pool {
+      background: #e9ecef;
+      padding: 15px;
+      border-bottom: 2px solid #ccc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 160px;
+    }
+    @media (max-width: 768px) {
+      #question-pool {
+        position: sticky;
+        top: 0;
+        z-index: 1500;
+      }
+    }
+
+    /* 버튼 + 카드 래퍼 */
+    #stack-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    #stack {
+      width: 280px;
+      height: 110px;
+      border: 2px dashed #bbb;
+      border-radius: 12px;
+      background: #f8f9fa;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .q-card {
+      background: white;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      width: 260px;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      cursor: grab;
+      border: 2px solid var(--accent-color);
+      touch-action: none;
+      position: absolute;
+      z-index: 3000;
+    }
+    .q-card.in-slot,
+    .q-card.dragging-small {
+      width: 68px !important;
+      height: 68px !important;
+      font-size: 8px !important;
+      padding: 4px !important;
+      border: 1px solid #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      top: 0 !important;
+      left: 0 !important;
+    }
+
+    .board-wrapper {
+      width: 100%;
+      background: white;
+      padding: 30px 0;
+      overflow-x: auto;
+      overflow-y: visible;
+      touch-action: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .board-inner {
+      display: block;
+      margin: 0 auto;
+      padding: 20px;
+      box-sizing: content-box;
+    }
+
+    .zoom-control {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: row !important;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .zoom-btn {
+      padding: 6px 10px;
+      background: #ddd;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #pyramid-zoom-wrapper {
+      display: inline-block;
+      transform-origin: top left;
+      transition: transform 0.1s ease;
+      text-align: center;
+    }
+
+    .board-container {
+      display: flex;
+      gap: 4px;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .column {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .score-box {
+      order: -1;
+      text-align: center;
+      width: 68px;
+      margin-bottom: 4px;
+      font-weight: bold;
+      font-size: 16px;
+      color: var(--primary-color);
+    }
+
+    .slot {
+      width: 68px;
+      height: 68px;
+      border: 2px dashed #bdc3c7;
+      border-radius: 10px;
+      background: #fafafa;
+      position: relative;
+    }
+    .slot.occupied {
+      border-style: solid;
+      border-color: #eee;
+      background: white;
+    }
+    .slot.highlight {
+      background: #e3f2fd;
+      border-color: var(--accent-color);
+    }
+
+    .score-label-row {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-top: 20px;
+      font-weight: 900;
+      font-size: 16px;
+      padding: 0 10px;
+      box-sizing: border-box;
+    }
+    .score-label-row span { white-space: nowrap; }
+    .score-label-row .left { color: var(--disagree-color); }
+    .score-label-row .center { color: #7f8c8d; }
+    .score-label-row .right { color: var(--agree-color); }
+
+    .arrow-scale {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      column-gap: 30px;
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    .arrow-bar {
+      position: relative;
+      width: 100%;
+      height: 24px;
+      border-radius: 12px;
+      background: linear-gradient(
+        90deg,
+        #e74c3c 0%,
+        #e74c3c 30%,
+        #ffffff 45%,
+        #ffffff 55%,
+        #27ae60 70%,
+        #27ae60 100%
+      );
+    }
+    .arrow-bar::before,
+    .arrow-bar::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      border-top: 9px solid transparent;
+      border-bottom: 9px solid transparent;
+    }
+    .arrow-bar::before {
+      left: -14px;
+      border-right: 14px solid #e74c3c;
+    }
+    .arrow-bar::after {
+      right: -14px;
+      border-left: 14px solid #27ae60;
+    }
+    .arrow-middle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: rgba(0, 0, 0, 0.7);
+      pointer-events: none;
+    }
+
+    .form-section {
+      background: white;
+      margin: 15px;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .form-section h3 {
+      border-left: 4px solid var(--accent-color);
+      padding-left: 10px;
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+    }
+
+    .reason-box {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      border-top: 2px solid #ddd;
+    }
+
+    .info-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    .info-table td {
+      padding: 12px 8px;
+      border-bottom: 1px solid #eee;
+    }
+    .info-label {
+      font-weight: bold;
+      width: 100px;
+      color: #555;
+      font-size: 14px;
+    }
+    .info-input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+    .radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 14px;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-family: inherit;
+      margin-top: 10px;
+      box-sizing: border-box;
+    }
+
+    .footer {
+      padding: 30px 20px;
+      text-align: center;
+    }
+
+    .pyramid-guide-strong {
+      color: var(--accent-color);
+      font-size: 0.8rem;
+      line-height: 1.4;
+    }
+
+    #finish-btn {
+      padding: 18px;
+      border-radius: 40px;
+      border: none;
+      background: #ccc;
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
+      width: 100%;
+      max-width: 400px;
+      cursor: pointer;
+    }
+    #finish-btn.active { background: var(--agree-color); }
+
+    #done-screen {
+      display: none;
+      padding: 80px 20px;
+      text-align: center;
+      font-size: 1.1rem;
+    }
+
+    .nav-btn {
+      width: 70px;
+      height: 36px;
+      border-radius: 18px;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      color: #fff;
+    }
+    .nav-btn.left  { background: #bdc3c7; }
+    .nav-btn.right { background: var(--accent-color); }
+
+  </style>
+</head>
+<body>
+
+<div id="done-screen">
+  이미 설문에 참여하셨습니다. 참여해 주셔서 감사합니다!
+</div>
+
+<form id="google-submit-form"
+      action="https://docs.google.com/forms/d/e/1FAIpQLSdX9_ftNLDGXLTiNB5IljFK3Rs12kKIXvPf0v71IdWPk8rkIg/formResponse"
+      method="POST" target="hidden_iframe" style="display:none;">
+  <input type="hidden" name="entry.613867245" id="g-entry-1">
+  <input type="hidden" name="entry.476202889" id="g-entry-2">
+  <input type="hidden" name="entry.1876317189" id="g-entry-3">
+</form>
+<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+
+<!-- ================= 설문 페이지 ================= -->
+<div id="survey-page" class="active">
+
+<header>
+  <div class="main-title">80년대생 부모에게 '거실 TV'는 어떤 의미인가?(가칭)</div>
+  <div class="sub-desc">
+    <p style="color: #555; background-color: #f8f9fa; padding: 12px; border-radius: 5px; border-left: 5px solid #007bff; margin-bottom: 5px; font-size: 1rem;">
+      ⚠️ 본 설문은 <b>스마트폰(모바일)</b>에서도 참여가 가능하나, 드래그 앤 드롭 방식의 특성상 <b>PC나 태블릿(패드)</b> 환경에서 더욱 원활하게 참여하실 수 있습니다. 일부 기업 PC는 보안 문제로 설문 결과 전송이 어려울 수 있으니 개인 PC나 스마트폰 사용을 권장합니다.
+    </p>
+
+    <p style="line-height: 1.8; margin-top: 0; margin-bottom: 15px; font-size: 1rem; color: #000;">
+     본 설문은 지역방송의 사투리에 대한 인식을 확인하기 위한 것입니다.<br>
+      34개의 진술문을 읽고, 동의 정도에 따라 진술문을 드래그하여 아래 피라미드 칸을 모두 채워주십시오.<br>
+      <span style="color: #007bff;">피라미드의 <b>가로축</b>은 오른쪽으로 갈수록 '동의함'을, 왼쪽으로 갈수록 '동의하지 않음'을 의미하며, 세로축은 위아래 위치와 관계없이 동일한 동의 정도를 뜻합니다.</span><br>
+      본 설문은 정답이 없으므로, 사회적으로 바람직한 답변보다는 귀하의 솔직한 의견을 기록해 주시기를 부탁드립니다.<br>
+      설문 항목을 빠짐없이 작성해주신 분들께 감사의 의미로 <b style="color: #007bff;">1만 원 상당의 스타벅스 쿠폰</b>을 보내드립니다. 기프티콘 발송을 위해 연락처를 정확히 기재해 주시기 바랍니다.
+    </p>
+      
+    <p style="font-size: 0.9rem; color: #666; border-top: 1px solid #eee; padding-top: 10px; line-height: 1.6; margin-top: 0;">
+      답해주신 의견은 통계법 제33조에 따라 비밀이 보장되며, 연구 목적 외에는 절대 활용되지 않습니다.<br>
+      연구책임자: 강승화 (010-8545-2338 / 00mandoo@naver.com)
+    </p>
+  </div>
+</header>
+
+  <div id="question-pool">
+    <div id="counter"
+         style="font-weight:bold; color:var(--accent-color); margin-bottom:8px;">
+      남은 문항: 34/34
+    </div>
+
+    <div id="stack-wrapper">
+      <button class="nav-btn left" id="prev-btn" type="button">이전</button>
+      <div id="stack"></div>
+      <button class="nav-btn right" id="next-btn" type="button">다음</button>
+    </div>
+  </div>
+
+  <div class="board-wrapper">
+    <div class="board-inner">
+      <div class="zoom-control">
+        <span>피라미드 확대/축소</span>
+        <button class="zoom-btn" id="zoom-out-btn" type="button">-</button>
+        <button class="zoom-btn" id="zoom-in-btn" type="button">+</button>
+      </div>
+
+      <div id="pyramid-zoom-wrapper">
+        <div class="arrow-scale">
+          <span class="label left">매우 비동의</span>
+          <div class="arrow-bar">
+            <span class="arrow-middle">중립</span>
+          </div>
+          <span class="label right">매우 동의</span>
+        </div>
+        <div class="board-container" id="board"></div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <button id="finish-btn" type="button" disabled onclick="goFinalPage()">
+        모든 문항을 배치해 주세요
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 마지막 페이지 ================= -->
+<div id="final-form-page">
+
+  <header>
+    <div class="main-title">양극단 배치 이유 및 인적 사항</div>
+  </header>
+
+  <div class="form-section">
+  <h3>1. 양극단 배치 이유</h3>
+  <p style="font-size:0.9rem; color:#555; line-height:1.5;">
+    아래는 응답자께서 좌우측 양극단에 배치한 4개의 진술문입니다.
+    각 진술문이 그 위치에 놓인 이유를 간단히 적어 주세요.
+  </p>
+  <div id="reason-container"></div>
+</div>
+  <div class="form-section">
+    <h3>2. 인적 사항</h3>
+    <table class="info-table">
+      <tr>
+        <td class="info-label">출생연도</td>
+        <td>
+          19 <input type="number" id="info-year"
+                    style="width:60px; padding:5px;" placeholder="85"> 년
+        </td>
+      </tr>
+      <tr>
+        <td class="info-label">성별</td>
+        <td class="radio-group">
+  <label><input type="radio" name="gender" value="남"> 남</label>
+  <label><input type="radio" name="gender" value="여"> 여</label>
+</td>
+      </tr>
+      <tr>
+  <td class="info-label">공용공간 TV</td>
+  <td class="radio-group">
+    <label><input type="radio" name="tv_livingroom" value="있음"> 있음</label>
+    <label><input type="radio" name="tv_livingroom" value="없음"> 없음</label>
+  </td>
+</tr>
+      <tr>
+        <td class="info-label">직업</td>
+        <td class="radio-group">
+          <label><input type="radio" name="job" value="회사원"> 회사원</label>
+          <label><input type="radio" name="job" value="자영업"> 자영업</label><br>
+          <label><input type="radio" name="job" value="전업양육자"> 전업양육자</label>
+          <label><input type="radio" name="job" value="프리랜서"> 프리랜서</label><br>
+          <label><input type="radio" name="job" value="기타"> 기타</label>
+          <input type="text" id="info-job-etc"
+                 placeholder="기타 내용 입력"
+                 style="width:120px; border:1px solid #ddd; padding:5px;">
+        </td>
+      </tr>
+      <tr>
+        <td class="info-label">휴대폰<br><small>(쿠폰 수령용)</small></td>
+        <td>
+          <input type="text" id="info-phone" class="info-input"
+                 placeholder="010-0000-0000">
+        </td>
+      </tr>
+      <tr>
+        <td class="info-label">가족구성<br><small>(자녀나이 필수)</small></td>
+        <td>
+          <input type="text" id="info-family" class="info-input"
+                 placeholder="예) 외조모, 부부와 자녀 2명(7세, 3세)">
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="footer">
+    <button type="button"
+            onclick="backToFirst()"
+            style="background:#888; color:white; padding:12px 20px;
+                   border-radius:30px; border:none; margin-bottom:10px;">
+      이전 단계로 돌아가기
+    </button><br>
+    <button type="button"
+            onclick="submitAll()"
+            style="background:var(--primary-color); color:white; padding:18px;
+                   border-radius:40px; border:none; width:100%; max-width:400px;
+                   font-weight:bold;">
+      설문 최종 제출하기
+    </button>
+  </div>
+</div>
+
+<script>
+  const questions = [
+    "1. 거실 TV를 보며 가족이 함께 시간을 보내는 순간이 소중하다",
+    "2. 거실 TV는 각자 방으로 흩어진 가족을 한곳으로 모으는 역할을 한다",
+    "3. 거실 TV를 보며 나누는 가벼운 수다도 의미있는 소통이라고 생각한다",
+    "4. 거실 TV가 없다면 명절이나 가족 모임이 어색할 것 같다",
+    "5. 돌이켜보니 과거 가족 모두가 TV 하나를 함께 보던 시절이 좋았다",
+    "6. TV를 켜두고 각자 스마트폰을 하더라도 함께 있는 것 자체가 의미 있다",
+    "7. 거실 TV 소리가 들려야 사람 사는 온기가 느껴진다",
+    "8. 거실 TV를 꺼야만 비로소 깊은 대화가 시작된다",
+    "9. TV가 거실 중심을 차지하는 구조는 구시대적 배치다",
+    "10. 거실 벽면을 TV 대신 책장이나 그림으로 채우는 것이 아이의 정서 발달에 더 도움된다",
+    "11. 아이도 부모 눈치 안 보고 자기 방에서 편하게 영상 볼 자유가 있다",
+    "12. 유튜브의 자극적인 영상들에 비하면, TV 프로그램은 싱겁게 느껴진다",
+    "13. TV 프로그램도 유튜브만큼이나 상업적이고 자극적이다",
+    "14. 유해물이 넘치는 온라인보다 TV 방송이 훨씬 안전한 공간 같다",
+    "15. 아이 프로그램을 고를 때 방송사나 채널 브랜드를 따진다",
+    "16. 편성된 TV 프로그램은 아이 프로그램을 고르는 나의 수고를 덜어준다",
+    "17. 실시간 방송을 참고 기다려야 하는 TV 방식은 요즘 애들에겐 고문이다",
+    "18. 유튜브 알고리즘은 아이의 취향을 귀신같이 찾아내 몰입시킨다",
+    "19. 틀에 박힌 TV보다 날것 그대로인 온라인 영상이 아이의 사고력 확장에 낫다",
+    "20. 매체와 상관없이 아이가 영상물에 노출되는 환경 자체가 늘 불안하다",
+    "21. TV든 유튜브든 결국 콘텐츠 자체가 좋으면 그만이다",
+    "22. 전문가들의 미디어 조언을 우리 집에 적용하기엔 너무 동떨어져 있다",
+    "23. 거실 TV는 아이가 뭘 보는지 확인할 수 있어서 안심이 된다",
+    "24. 거실 TV는 고정되어 있어 장소 불문 영상을 찾는 아이의 습관을 잡기에 좋다",
+    "25. TV는 유튜브와 달리 자동 재생이 안 돼서 시청을 끝내기가 수월하다",
+    "26. 스마트폰보다 멀찍이 떨어져 보는 거실 TV가 아이의 눈건강이나 자세에 낫다",
+    "27. 아이를 키우는 가정에서 거실 TV는 육아를 돕는 필수적인 도구다",
+    "28. TV 채널권을 두고 양보하거나 조율하는 과정도 아이에게 교육이다",
+    "29. 집밖에서 남에게 피해를 주지 않으려면, 아이에게 영상을 보여줄 수밖에 없다",
+    "30. 원칙도 중요하지만 때로는 부모의 심리적 여유를 위해 미디어를 허용하는 게 현명하다",
+    "31. 아이의 영상 시청은 단속하면서 정작 스마트폰을 못 놓는 내 모습에 모순을 느낀다",
+    "32. 미디어 시청 습관이 제대로 안 잡힌 아이들을 보면 솔직히 부모의 방치 같다",
+    "33. 어차피 크면 스마트폰에 둘러싸여 살 아이들이므로, 거실 TV 시청 훈육에 애쓸 필요가 없다",
+    "34. 아이 스스로 콘텐츠를 골라보게 하는 것도, 시대에 맞는 미디어 교육이다"
+  ];
+
+  const layout = [
+    {s:"-4", n:2}, {s:"-3", n:3}, {s:"-2", n:4}, {s:"-1", n:5},
+    {s:"0",  n:6},
+    {s:"1",  n:5}, {s:"2", n:4}, {s:"3", n:3}, {s:"4", n:2}
+  ];
+
+  let currentQIdx = 0;
+  let scale = 0.6;
+  let lastScale = 1;
+  let lastDistance = 0;
+  let savedPersonalInfo = {};
+  let savedReasons = {};
+
+  let used = new Array(questions.length).fill(false);
+
+  const board = document.getElementById('board');
+  layout.forEach(item => {
+    const col = document.createElement('div');
+    col.className = 'column';
+    col.dataset.score = item.s;
+    for (let i=0; i<item.n; i++) {
+      const slot = document.createElement('div');
+      slot.className = 'slot';
+      col.appendChild(slot);
+    }
+    const label = document.createElement('div');
+    label.className = 'score-box';
+    label.textContent = item.s;
+    col.appendChild(label);
+    board.appendChild(col);
+  });
+
+  function showCurrentCard() {
+    if (used[currentQIdx]) {
+      const nextIdx = used.findIndex(v => !v);
+      if (nextIdx === -1) {
+        const stack = document.getElementById('stack');
+        const old = stack.querySelector('.q-card');
+        if (old) old.remove();
+        updateStatus();
+        return;
+      }
+      currentQIdx = nextIdx;
+    }
+
+    const stack = document.getElementById('stack');
+    const old = stack.querySelector('.q-card');
+    if (old) old.remove();
+
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.textContent = questions[currentQIdx];
+    card.dataset.idx = currentQIdx;
+    stack.appendChild(card);
+    makeDraggable(card);
+    updateStatus();
+  }
+
+  function makeDraggable(el) {
+    let startX, startY, initialRect;
+
+    const onStart = (e) => {
+      const t = e.type.includes('touch') ? e.touches[0] : e;
+      startX = t.clientX;
+      startY = t.clientY;
+      initialRect = el.getBoundingClientRect();
+
+      if (el.parentElement.classList.contains('slot')) {
+        el.parentElement.classList.remove('occupied');
+      }
+      if (el.classList.contains('in-slot')) el.classList.add('dragging-small');
+
+      el.style.position = 'fixed';
+      el.style.width = initialRect.width + 'px';
+      el.style.height = initialRect.height + 'px';
+      el.style.left = initialRect.left + 'px';
+      el.style.top  = initialRect.top  + 'px';
+      el.style.zIndex = '5000';
+
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('touchmove', onMove, {passive:false});
+      document.addEventListener('mouseup', onEnd);
+      document.addEventListener('touchend', onEnd);
+    };
+
+    const onMove = (e) => {
+      e.preventDefault();
+      const t = e.type.includes('touch') ? e.touches[0] : e;
+      el.style.left = initialRect.left + (t.clientX - startX) + 'px';
+      el.style.top  = initialRect.top  + (t.clientY - startY) + 'px';
+      document.querySelectorAll('.slot').forEach(s => s.classList.remove('highlight'));
+      const target = findClosestSlot(t.clientX, t.clientY);
+      if (target) target.classList.add('highlight');
+    };
+
+    const onEnd = (e) => {
+      const t = e.type.includes('touch') ? e.changedTouches[0] : e;
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('touchmove', onMove);
+      document.removeEventListener('mouseup', onEnd);
+      document.removeEventListener('touchend', onEnd);
+      el.classList.remove('dragging-small');
+      document.querySelectorAll('.slot').forEach(s => s.classList.remove('highlight'));
+
+      const target = findClosestSlot(t.clientX, t.clientY);
+      const idx = parseInt(el.dataset.idx, 10);
+
+      if (target) {
+        const fromStack = el.parentElement.id === 'stack';
+
+        target.appendChild(el);
+        target.classList.add('occupied');
+        el.className = 'q-card in-slot';
+        el.style = "";
+
+        if (fromStack) {
+          used[idx] = true;
+          const nextIdx = used.findIndex(v => !v);
+          if (nextIdx !== -1) {
+            currentQIdx = nextIdx;
+            showCurrentCard();
+          } else {
+            const stack = document.getElementById('stack');
+            const old = stack.querySelector('.q-card');
+            if (old) old.remove();
+          }
+        }
+      } else {
+        if (el.parentElement.classList.contains('slot')) {
+          el.parentElement.classList.remove('occupied');
+        }
+        document.getElementById('stack').appendChild(el);
+        el.className = 'q-card';
+        el.style = "";
+        el.style.position = 'absolute';
+        used[idx] = false;
+        currentQIdx = idx;
+      }
+
+      updateStatus();
+    };
+
+    function findClosestSlot(mx, my) {
+      let closest = null;
+      let minDistance = 120;
+      document.querySelectorAll('.slot:not(.occupied)').forEach(slot => {
+        const sRect = slot.getBoundingClientRect();
+        const dist = Math.hypot(
+          (sRect.left + sRect.width / 2) - mx,
+          (sRect.top  + sRect.height / 2) - my
+        );
+        if (dist < minDistance) {
+          minDistance = dist;
+          closest = slot;
+        }
+      });
+      return closest;
+    }
+
+    el.addEventListener('mousedown', onStart);
+    el.addEventListener('touchstart', onStart);
+  }
+
+  function updateStatus() {
+    const placed = document.querySelectorAll('.slot.occupied .q-card').length;
+    const remainingCards = 34 - placed;
+
+    document.getElementById('counter').textContent =
+      `남은 문항: ${remainingCards}/34`;
+
+    const btn = document.getElementById('finish-btn');
+    if (placed === 34) {
+      btn.disabled = false;
+      btn.classList.add('active');
+      btn.textContent = "다음 단계: 양극단 배치 이유 및 인적 사항";
+    } else {
+      btn.disabled = true;
+      btn.classList.remove('active');
+      btn.textContent = "모든 문항을 배치해 주세요";
+    }
+  }
+
+  function goFinalPage() {
+    const placed = document.querySelectorAll('.slot.occupied .q-card').length;
+    if (placed !== 34) {
+      alert('모든 문항을 배치해 주세요.');
+      return;
+    }
+
+    const container = document.getElementById('reason-container');
+    const mapping = {"-4": "매우 비동의", "4": "매우 동의"};
+    container.innerHTML = "";
+
+   Object.keys(mapping).forEach(score => {
+  const cards = document.querySelectorAll(`.column[data-score="${score}"] .q-card`);
+  cards.forEach(card => {
+    const qText = card.textContent;
+    const savedValue = savedReasons[qText] || "";
+    const div = document.createElement('div');
+    div.className = "reason-box";
+    
+    // 이 부분에서 색상 적용 범위를 분리합니다.
+    const colorStyle = score === "4" ? "color: var(--agree-color);" : "color: var(--disagree-color);";
+    
+    div.innerHTML = `
+      <div style="font-weight:bold; margin-bottom: 8px;">
+        <span style="${colorStyle}">[${mapping[score]}]</span>
+        <span style="color: #000;"> ${qText}</span>
+      </div>
+      <textarea class="reason-input" data-q="${qText}"
+                placeholder="이유를 입력해 주세요.">${savedValue}</textarea>
+    `;
+    container.appendChild(div);
+  });
+});
+
+    const sp = document.getElementById('survey-page');
+    const fp = document.getElementById('final-form-page');
+
+    sp.classList.remove('active');
+    sp.style.display = 'none';
+    fp.classList.add('active');
+    fp.style.display = 'block';
+
+    window.scrollTo(0,0);
+  }
+
+  function backToFirst() {
+    document.querySelectorAll('.reason-input').forEach(input => {
+      savedReasons[input.dataset.q] = input.value;
+    });
+
+    const fp = document.getElementById('final-form-page');
+    const sp = document.getElementById('survey-page');
+
+    fp.classList.remove('active');
+    fp.style.display = 'none';
+    sp.classList.add('active');
+    sp.style.display = 'block';
+
+    window.scrollTo(0,0);
+  }
+
+  function submitAll() {
+    Array.from(document.querySelectorAll('.reason-input')).forEach(input => {
+      savedReasons[input.dataset.q] = input.value;
+    });
+    savedPersonalInfo = {
+      year: document.getElementById('info-year').value,
+      gender: document.querySelector('input[name="gender"]:checked')?.value || "",
+      job: document.querySelector('input[name="job"]:checked')?.value || "",
+      jobEtc: document.getElementById('info-job-etc').value,
+      phone: document.getElementById('info-phone').value,
+      family: document.getElementById('info-family').value
+    };
+
+    let sortData = "";
+    document.querySelectorAll('.slot.occupied .q-card').forEach(c => {
+      sortData += `${c.textContent.split('.')[0]}:${c.parentElement.parentElement.dataset.score}, `;
+    });
+
+    const gender = document.querySelector('input[name="gender"]:checked')?.value || "미선택";
+    const tvLivingroom = document.querySelector('input[name="tv_livingroom"]:checked')?.value || '미선택';
+    const job = document.querySelector('input[name="job"]:checked')?.value || "미선택";
+    const jobEtc = document.getElementById('info-job-etc').value;
+  const personalInfo =
+  `출생:19${document.getElementById('info-year').value} / ` +
+  `성별:${gender} / ` +
+  `공용공간TV:${tvLivingroom} / ` +
+  `직업:${job}(${jobEtc}) / ` +
+  `연락처:${document.getElementById('info-phone').value} / ` +
+  `가족:${document.getElementById('info-family').value}`;
+
+    document.getElementById('g-entry-1').value = sortData;
+    document.getElementById('g-entry-2').value =
+      Array.from(document.querySelectorAll('.reason-input'))
+           .map(i => `${i.dataset.q}:${i.value}`).join('\n');
+    document.getElementById('g-entry-3').value = personalInfo;
+
+    document.getElementById('google-submit-form').submit();
+    setTimeout(() => {
+      alert("성공적으로 제출되었습니다. 감사합니다!");
+      localStorage.setItem('survey_done_tv80', 'true');
+      setTimeout(() => location.reload(), 1500);
+    }, 1000);
+  }
+
+  document.getElementById('next-btn').addEventListener('click', () => {
+    if (!used.some(v => !v)) return;
+    let idx = currentQIdx;
+    let safety = 0;
+    do {
+      idx = (idx + 1) % questions.length;
+      safety++;
+    } while (used[idx] && safety < questions.length);
+    currentQIdx = idx;
+    showCurrentCard();
+  });
+
+  document.getElementById('prev-btn').addEventListener('click', () => {
+    if (!used.some(v => !v)) return;
+    let idx = currentQIdx;
+    let safety = 0;
+    do {
+      idx = (idx - 1 + questions.length) % questions.length;
+      safety++;
+    } while (used[idx] && safety < questions.length);
+    currentQIdx = idx;
+    showCurrentCard();
+  });
+
+  document.getElementById('zoom-in-btn').addEventListener('click', () => {
+    scale = Math.min(scale + 0.1, 1.1);
+    updateScale();
+  });
+  document.getElementById('zoom-out-btn').addEventListener('click', () => {
+    scale = Math.max(scale - 0.1, 0.6);
+    updateScale();
+  });
+
+  document.addEventListener('touchstart', function(e) {
+    if (e.touches.length === 2) {
+      lastScale = scale;
+      lastDistance = Math.hypot(
+        e.touches[1].pageX - e.touches[0].pageX,
+        e.touches[1].pageY - e.touches[0].pageY
+      );
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchmove', function(e) {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const currentDistance = Math.hypot(
+        e.touches[1].pageX - e.touches[0].pageX,
+        e.touches[1].pageY - e.touches[0].pageY
+      );
+      scale = lastScale * (currentDistance / lastDistance);
+      scale = Math.min(Math.max(scale, 0.6), 1.1);
+      updateScale();
+    }
+  }, { passive: false });
+
+  function updateScale() {
+    const wrapper = document.getElementById('pyramid-zoom-wrapper');
+    const inner = document.querySelector('.board-inner');
+    const boardContainer = document.querySelector('.board-container');
+
+    wrapper.style.transformOrigin = "top left";
+    wrapper.style.transform = `scale(${scale})`;
+
+    const originalWidth  = boardContainer.offsetWidth;
+    const originalHeight = wrapper.offsetHeight;
+    const scaledWidth  = originalWidth * scale;
+    const scaledHeight = originalHeight * scale;
+
+    inner.style.width  = scaledWidth + "px";
+    inner.style.height = (scaledHeight + 50) + "px";
+
+    const screenWidth = document.querySelector('.board-wrapper').clientWidth;
+
+    inner.style.marginLeft  = "auto";
+    inner.style.marginRight = "auto";
+
+    if (scaledWidth > screenWidth) {
+      inner.style.paddingLeft  = "20px";
+      inner.style.paddingRight = "20px";
+    } else {
+      inner.style.paddingLeft  = "0";
+      inner.style.paddingRight = "0";
+    }
+  }
+
+  // 초기 카드 표시
+  showCurrentCard();
+</script>
+</body>
+</html>
+
+
