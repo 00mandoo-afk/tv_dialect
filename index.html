@@ -842,50 +842,96 @@
   }
 
   function submitAll() {
-    Array.from(document.querySelectorAll('.reason-input')).forEach(input => {
-      savedReasons[input.dataset.q] = input.value;
-    });
-    savedPersonalInfo = {
-      year: document.getElementById('info-year').value,
-      gender: document.querySelector('input[name="gender"]:checked')?.value || "",
-      job: document.querySelector('input[name="job"]:checked')?.value || "",
-      jobEtc: document.getElementById('info-job-etc').value,
-      phone: document.getElementById('info-phone').value,
-      family: document.getElementById('info-family').value
-    };
+  // 필수 항목 체크
+  const year = document.getElementById('info-year').value;
+  const gender = document.querySelector('input[name="gender"]:checked');
+  const region = document.querySelector('input[name="region"]:checked');
+  const residenceYears = document.getElementById('info-residence-years').value;
+  const job = document.querySelector('input[name="job"]:checked');
+  const phone = document.getElementById('info-phone').value;
 
-    let sortData = "";
-    document.querySelectorAll('.slot.occupied .q-card').forEach(c => {
-      sortData += `${c.textContent.split('.')[0]}:${c.parentElement.parentElement.dataset.score}, `;
-    });
-const gender = document.querySelector('input[name="gender"]:checked')?.value || "미선택";
-const region = document.querySelector('input[name="region"]:checked')?.value || '미선택';
-const residenceYears = document.getElementById('info-residence-years').value || '미입력';
-const job = document.querySelector('input[name="job"]:checked')?.value || "미선택";
-const jobEtc = document.getElementById('info-job-etc').value;
-
-const personalInfo =
-  `출생:19${document.getElementById('info-year').value} / ` +
-  `성별:${gender} / ` +
-  `거주지역:${region} / ` +
-  `거주기간:${residenceYears}년 / ` +
-  `직업:${job}(${jobEtc}) / ` +
-  `연락처:${document.getElementById('info-phone').value} / ` +
-  `가족:${document.getElementById('info-family').value}`;
-   
-    document.getElementById('g-entry-1').value = sortData;
-    document.getElementById('g-entry-2').value =
-      Array.from(document.querySelectorAll('.reason-input'))
-           .map(i => `${i.dataset.q}:${i.value}`).join('\n');
-    document.getElementById('g-entry-3').value = personalInfo;
-
-    document.getElementById('google-submit-form').submit();
-    setTimeout(() => {
-      alert("성공적으로 제출되었습니다. 감사합니다!");
-      localStorage.setItem('survey_done_tv80', 'true');
-      setTimeout(() => location.reload(), 1500);
-    }, 1000);
+  // 필수 항목 검증
+  if (!year) {
+    alert('출생연도를 입력해주세요.');
+    return;
   }
+  if (!gender) {
+    alert('성별을 선택해주세요.');
+    return;
+  }
+  if (!region) {
+    alert('거주지역을 선택해주세요.');
+    return;
+  }
+  if (!residenceYears) {
+    alert('거주기간을 입력해주세요.');
+    return;
+  }
+  if (!job) {
+    alert('직업을 선택해주세요.');
+    return;
+  }
+  if (!phone) {
+    alert('휴대폰 번호를 입력해주세요.');
+    return;
+  }
+
+  // 양극단 이유 입력 체크
+  const reasonInputs = document.querySelectorAll('.reason-input');
+  let allFilled = true;
+  reasonInputs.forEach(input => {
+    if (!input.value.trim()) {
+      allFilled = false;
+    }
+  });
+  
+  if (!allFilled) {
+    alert('양극단 배치 이유를 모두 입력해주세요.');
+    return;
+  }
+
+  Array.from(document.querySelectorAll('.reason-input')).forEach(input => {
+    savedReasons[input.dataset.q] = input.value;
+  });
+
+  let sortData = "";
+  document.querySelectorAll('.slot.occupied .q-card').forEach(c => {
+    sortData += `${c.textContent.split('.')[0]}:${c.parentElement.parentElement.dataset.score}, `;
+  });
+
+  const genderValue = gender.value;
+  const regionValue = region.value;
+  const jobValue = job.value;
+  const jobEtc = document.getElementById('info-job-etc').value;
+
+  const personalInfo =
+    `출생:19${year} / ` +
+    `성별:${genderValue} / ` +
+    `거주지역:${regionValue} / ` +
+    `거주기간:${residenceYears}년 / ` +
+    `직업:${jobValue}(${jobEtc}) / ` +
+    `연락처:${phone}`;
+   
+  document.getElementById('g-entry-1').value = sortData;
+  document.getElementById('g-entry-2').value =
+    Array.from(document.querySelectorAll('.reason-input'))
+         .map(i => `${i.dataset.q}:${i.value}`).join('\n');
+  document.getElementById('g-entry-3').value = personalInfo;
+
+  console.log('제출 데이터:', {
+    sortData,
+    reasons: document.getElementById('g-entry-2').value,
+    personalInfo
+  });
+
+  document.getElementById('google-submit-form').submit();
+  
+  setTimeout(() => {
+    alert("성공적으로 제출되었습니다. 감사합니다!");
+    localStorage.setItem('survey_done_tv80', 'true');
+    setTimeout(() => location.reload(), 1500);
+  }, 1000);
+}
 
   document.getElementById('next-btn').addEventListener('click', () => {
     if (!used.some(v => !v)) return;
