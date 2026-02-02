@@ -398,7 +398,7 @@
 </div>
 
 <form id="google-submit-form"
-      action="https://docs.google.com/forms/d/e/1FAIpQLSfJCm4vPHetnRgAetDZvywoOu6BIxWeMcTsiwmcR8m29k/formResponse"
+      action="https://docs.google.com/forms/u/0/d/1JCm4vPHetnRgAetDZvywoOu6BIxWeMcTsiwmcR8m29k/formResponse"
       method="POST" target="hidden_iframe" style="display:none;">
   <input type="hidden" name="entry.1103287866" id="g-entry-1">
   <input type="hidden" name="entry.2023333146" id="g-entry-2">
