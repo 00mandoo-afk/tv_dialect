@@ -410,7 +410,7 @@
 <div id="survey-page" class="active">
 
 <header>
-  <div class="main-title">80년대생 부모에게 '거실 TV'는 어떤 의미인가?(가칭)</div>
+  <div class="main-title">TV사투리연구?(가칭)</div>
   <div class="sub-desc">
     <p style="color: #555; background-color: #f8f9fa; padding: 12px; border-radius: 5px; border-left: 5px solid #007bff; margin-bottom: 5px; font-size: 1rem;">
       ⚠️ 본 설문은 <b>스마트폰(모바일)</b>에서도 참여가 가능하나, 드래그 앤 드롭 방식의 특성상 <b>PC나 태블릿(패드)</b> 환경에서 더욱 원활하게 참여하실 수 있습니다. 일부 기업 PC는 보안 문제로 설문 결과 전송이 어려울 수 있으니 개인 PC나 스마트폰 사용을 권장합니다.
