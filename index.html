@@ -1,4 +1,3 @@
-# tv_dialect
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -24,15 +23,25 @@
       user-select: none;
     }
 
-    /* 두 페이지 공통 */
+    /* 페이지 공통 */
+    #intro-page-1,
+    #intro-page-2,
     #survey-page,
     #final-form-page {
       display: none;
       padding-bottom: 50px;
     }
+    #intro-page-1.active,
+    #intro-page-2.active,
     #survey-page.active,
     #final-form-page.active {
       display: block;
+    }
+
+    #intro-page-1,
+    #intro-page-2 {
+      min-height: 100vh;
+      background: #f4f7f9;
     }
 
     header {
@@ -82,7 +91,6 @@
       }
     }
 
-    /* 버튼 + 카드 래퍼 */
     #stack-wrapper {
       display: flex;
       align-items: center;
@@ -216,21 +224,6 @@
       border-color: var(--accent-color);
     }
 
-    .score-label-row {
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-      margin-top: 20px;
-      font-weight: 900;
-      font-size: 16px;
-      padding: 0 10px;
-      box-sizing: border-box;
-    }
-    .score-label-row span { white-space: nowrap; }
-    .score-label-row .left { color: var(--disagree-color); }
-    .score-label-row .center { color: #7f8c8d; }
-    .score-label-row .right { color: var(--agree-color); }
-
     .arrow-scale {
       display: grid;
       grid-template-columns: auto 1fr auto;
@@ -247,12 +240,9 @@
       border-radius: 12px;
       background: linear-gradient(
         90deg,
-        #e74c3c 0%,
-        #e74c3c 30%,
-        #ffffff 45%,
-        #ffffff 55%,
-        #27ae60 70%,
-        #27ae60 100%
+        #e74c3c 0%, #e74c3c 30%,
+        #ffffff 45%, #ffffff 55%,
+        #27ae60 70%, #27ae60 100%
       );
     }
     .arrow-bar::before,
@@ -279,7 +269,7 @@
       transform: translate(-50%, -50%);
       font-size: 0.8rem;
       font-weight: 700;
-      color: rgba(0, 0, 0, 0.7);
+      color: rgba(0,0,0,0.7);
       pointer-events: none;
     }
 
@@ -349,12 +339,6 @@
       text-align: center;
     }
 
-    .pyramid-guide-strong {
-      color: var(--accent-color);
-      font-size: 0.8rem;
-      line-height: 1.4;
-    }
-
     #finish-btn {
       padding: 18px;
       border-radius: 40px;
@@ -389,6 +373,24 @@
     .nav-btn.left  { background: #bdc3c7; }
     .nav-btn.right { background: var(--accent-color); }
 
+    /* 인트로 버튼 공통 */
+    #start-survey-btn,
+    #start-survey-btn2 {
+      background: var(--accent-color);
+      color: white;
+      padding: 18px 0;
+      border-radius: 40px;
+      border: none;
+      width: 100%;
+      max-width: 400px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: block;
+      margin: 0 auto;
+    }
+    #start-survey-btn:active,
+    #start-survey-btn2:active { opacity: 0.85; }
   </style>
 </head>
 <body>
@@ -406,25 +408,133 @@
 </form>
 <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
 
-<!-- ================= 설문 페이지 ================= -->
-<div id="survey-page" class="active">
+<!-- ================= 인트로 1페이지: 안내문 ================= -->
+<div id="intro-page-1" class="active">
+  <header>
+    <div class="main-title">TV사투리연구(가칭)</div>
+  </header>
 
+  <div style="padding: 20px; max-width: 680px; margin: 0 auto;">
+
+    <div style="background: white; border-radius: 12px; padding: 20px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 16px;">
+      <p style="color: #555; background-color: #f8f9fa; padding: 12px; border-radius: 5px;
+                border-left: 5px solid #007bff; margin: 0 0 16px; font-size: 0.95rem; line-height: 1.6;">
+        ⚠️ 본 설문은 <b>스마트폰(모바일)</b>에서도 참여가 가능하나, 드래그 앤 드롭 방식의 특성상
+        <b>PC나 태블릿(패드)</b> 환경에서 더욱 원활하게 참여하실 수 있습니다.
+        일부 기업 PC는 보안 문제로 설문 결과 전송이 어려울 수 있으니 개인 PC나 스마트폰 사용을 권장합니다.
+      </p>
+      <p style="line-height: 1.8; margin: 0 0 16px; font-size: 1rem; color: #000;">
+        본 설문은 지역방송의 사투리에 대한 인식을 확인하기 위한 것입니다.<br>
+        34개의 진술문을 읽고, 동의 정도에 따라 진술문을 드래그하여 아래 피라미드 칸을 모두 채워주십시오.<br>
+        <span style="color: #007bff;">피라미드의 <b>가로축</b>은 오른쪽으로 갈수록 '동의함'을,
+        왼쪽으로 갈수록 '동의하지 않음'을 의미하며,
+        세로축은 위아래 위치와 관계없이 동일한 동의 정도를 뜻합니다.</span><br>
+        본 설문은 정답이 없으므로, 사회적으로 바람직한 답변보다는 귀하의 솔직한 의견을 기록해 주시기를 부탁드립니다.<br>
+        설문 항목을 빠짐없이 작성해주신 분들께 감사의 의미로 <b style="color: #007bff;">스타벅스 쿠폰</b>을 보내드립니다.
+        기프티콘 발송을 위해 연락처를 정확히 기재해 주시기 바랍니다.
+      </p>
+      <p style="font-size: 0.9rem; color: #666; border-top: 1px solid #eee;
+                padding-top: 10px; line-height: 1.6; margin: 0;">
+        답해주신 의견은 통계법 제33조에 따라 비밀이 보장되며, 연구 목적 외에는 절대 활용되지 않습니다.<br>
+        연구책임자: 강승화 (010-8545-2338 / 00mandoo@naver.com)
+      </p>
+    </div>
+
+    <div style="background: white; border-radius: 12px; padding: 20px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 16px;">
+      <h3 style="margin: 0 0 10px; font-size: 1rem; color: var(--primary-color);
+                 border-left: 4px solid var(--accent-color); padding-left: 10px;">
+        본 연구에서 '사투리 방송'이란?
+      </h3>
+      <p style="font-size: 0.95rem; line-height: 1.8; margin: 0; color: #333;">
+        진행자 혹은 주요 출연자가 <b>경상도 방언을 의도적·전면적으로 사용</b>하여
+        제작된 방송 콘텐츠를 의미합니다.<br>
+        다음 화면에서 샘플 영상을 확인하신 후 설문에 참여해 주세요.
+      </p>
+    </div>
+
+    <div style="text-align: center; margin-top: 8px;">
+      <button id="start-survey-btn" onclick="goClipPage()">
+        샘플 영상 보기 →
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================= 인트로 2페이지: 샘플 클립 ================= -->
+<div id="intro-page-2">
+  <header>
+    <div class="main-title">TV사투리연구(가칭)</div>
+  </header>
+
+  <div style="padding: 20px; max-width: 680px; margin: 0 auto;">
+
+    <div style="background: white; border-radius: 12px; padding: 20px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 16px;">
+      <p style="margin: 0 0 6px; font-size: 0.9rem; font-weight: 700;
+                color: var(--primary-color);">
+        📺 샘플 클립 — MBC경남 &lt;으샤으샤&gt; (2025.12.20 방영)
+      </p>
+      <p style="margin: 0 0 12px; font-size: 0.85rem; color: #555; line-height: 1.6;">
+        경남 지역 제조업 현장을 탐방하는 MBC경남 순제작 교양 프로그램으로,
+        해당 클립은 창원시 진해구 소재 <b>쿨스엔씨(주)</b>를 탐방한 에피소드입니다.
+      </p>
+      <div style="position: relative; padding-bottom: 56.25%; height: 0;
+                  overflow: hidden; border-radius: 8px;">
+        <iframe
+          src="https://www.youtube.com/embed/TDsuzgouj4g"
+          title="MBC경남 으샤으샤 샘플 클립"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media;
+                 gyroscope; picture-in-picture"
+          allowfullscreen
+          style="position: absolute; top: 0; left: 0;
+                 width: 100%; height: 100%; border-radius: 8px;">
+        </iframe>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 8px; display: flex;
+                flex-direction: column; align-items: center; gap: 12px;">
+      <button onclick="backToIntro()"
+              style="background: #888; color: white; padding: 12px 20px;
+                     border-radius: 30px; border: none; font-size: 0.95rem;
+                     font-weight: 600; cursor: pointer;">
+        ← 이전으로
+      </button>
+      <button id="start-survey-btn2" onclick="startSurvey()">
+        설문 시작하기 →
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================= 설문 페이지 ================= -->
+<div id="survey-page">
 <header>
   <div class="main-title">TV사투리연구(가칭)</div>
   <div class="sub-desc">
-    <p style="color: #555; background-color: #f8f9fa; padding: 12px; border-radius: 5px; border-left: 5px solid #007bff; margin-bottom: 5px; font-size: 1rem;">
-      ⚠️ 본 설문은 <b>스마트폰(모바일)</b>에서도 참여가 가능하나, 드래그 앤 드롭 방식의 특성상 <b>PC나 태블릿(패드)</b> 환경에서 더욱 원활하게 참여하실 수 있습니다. 일부 기업 PC는 보안 문제로 설문 결과 전송이 어려울 수 있으니 개인 PC나 스마트폰 사용을 권장합니다.
+    <p style="color: #555; background-color: #f8f9fa; padding: 12px; border-radius: 5px;
+              border-left: 5px solid #007bff; margin-bottom: 5px; font-size: 1rem;">
+      ⚠️ 본 설문은 <b>스마트폰(모바일)</b>에서도 참여가 가능하나, 드래그 앤 드롭 방식의 특성상
+      <b>PC나 태블릿(패드)</b> 환경에서 더욱 원활하게 참여하실 수 있습니다.
+      일부 기업 PC는 보안 문제로 설문 결과 전송이 어려울 수 있으니 개인 PC나 스마트폰 사용을 권장합니다.
     </p>
-
     <p style="line-height: 1.8; margin-top: 0; margin-bottom: 15px; font-size: 1rem; color: #000;">
-     본 설문은 지역방송의 사투리에 대한 인식을 확인하기 위한 것입니다.<br>
+      본 설문은 지역방송의 사투리에 대한 인식을 확인하기 위한 것입니다.<br>
       34개의 진술문을 읽고, 동의 정도에 따라 진술문을 드래그하여 아래 피라미드 칸을 모두 채워주십시오.<br>
-      <span style="color: #007bff;">피라미드의 <b>가로축</b>은 오른쪽으로 갈수록 '동의함'을, 왼쪽으로 갈수록 '동의하지 않음'을 의미하며, 세로축은 위아래 위치와 관계없이 동일한 동의 정도를 뜻합니다.</span><br>
+      <span style="color: #007bff;">피라미드의 <b>가로축</b>은 오른쪽으로 갈수록 '동의함'을,
+      왼쪽으로 갈수록 '동의하지 않음'을 의미하며,
+      세로축은 위아래 위치와 관계없이 동일한 동의 정도를 뜻합니다.</span><br>
       본 설문은 정답이 없으므로, 사회적으로 바람직한 답변보다는 귀하의 솔직한 의견을 기록해 주시기를 부탁드립니다.<br>
-      설문 항목을 빠짐없이 작성해주신 분들께 감사의 의미로 <b style="color: #007bff;">스타벅스 쿠폰</b>을 보내드립니다. 기프티콘 발송을 위해 연락처를 정확히 기재해 주시기 바랍니다.
+      설문 항목을 빠짐없이 작성해주신 분들께 감사의 의미로 <b style="color: #007bff;">스타벅스 쿠폰</b>을 보내드립니다.
+      기프티콘 발송을 위해 연락처를 정확히 기재해 주시기 바랍니다.
     </p>
-      
-    <p style="font-size: 0.9rem; color: #666; border-top: 1px solid #eee; padding-top: 10px; line-height: 1.6; margin-top: 0;">
+    <p style="font-size: 0.9rem; color: #666; border-top: 1px solid #eee;
+              padding-top: 10px; line-height: 1.6; margin-top: 0;">
       답해주신 의견은 통계법 제33조에 따라 비밀이 보장되며, 연구 목적 외에는 절대 활용되지 않습니다.<br>
       연구책임자: 강승화 (010-8545-2338 / 00mandoo@naver.com)
     </p>
@@ -436,7 +546,6 @@
          style="font-weight:bold; color:var(--accent-color); margin-bottom:8px;">
       남은 문항: 34/34
     </div>
-
     <div id="stack-wrapper">
       <button class="nav-btn left" id="prev-btn" type="button">이전</button>
       <div id="stack"></div>
@@ -451,7 +560,6 @@
         <button class="zoom-btn" id="zoom-out-btn" type="button">-</button>
         <button class="zoom-btn" id="zoom-in-btn" type="button">+</button>
       </div>
-
       <div id="pyramid-zoom-wrapper">
         <div class="arrow-scale">
           <span class="label left">매우 비동의</span>
@@ -463,7 +571,6 @@
         <div class="board-container" id="board"></div>
       </div>
     </div>
-
     <div class="footer">
       <button id="finish-btn" type="button" disabled onclick="goFinalPage()">
         모든 문항을 배치해 주세요
@@ -474,51 +581,47 @@
 
 <!-- ================= 마지막 페이지 ================= -->
 <div id="final-form-page">
-
   <header>
     <div class="main-title">양극단 배치 이유 및 인적 사항</div>
   </header>
 
   <div class="form-section">
-  <h3>1. 양극단 배치 이유</h3>
-  <p style="font-size:0.9rem; color:#555; line-height:1.5;">
-    아래는 응답자께서 좌우측 양극단에 배치한 4개의 진술문입니다.
-    각 진술문이 그 위치에 놓인 이유를 간단히 적어 주세요.
-  </p>
-  <div id="reason-container"></div>
-</div>
+    <h3>1. 양극단 배치 이유</h3>
+    <p style="font-size:0.9rem; color:#555; line-height:1.5;">
+      아래는 응답자께서 좌우측 양극단에 배치한 4개의 진술문입니다.
+      각 진술문이 그 위치에 놓인 이유를 간단히 적어 주세요.
+    </p>
+    <div id="reason-container"></div>
+  </div>
+
   <div class="form-section">
     <h3>2. 인적 사항</h3>
     <table class="info-table">
       <tr>
         <td class="info-label">출생연도</td>
-        <td>
-          19 <input type="number" id="info-year"
-                    style="width:60px; padding:5px;" placeholder="85"> 년
-        </td>
+        <td>19 <input type="number" id="info-year"
+                      style="width:60px; padding:5px;" placeholder="85"> 년</td>
       </tr>
       <tr>
         <td class="info-label">성별</td>
         <td class="radio-group">
-  <label><input type="radio" name="gender" value="남"> 남</label>
-  <label><input type="radio" name="gender" value="여"> 여</label>
-</td>
+          <label><input type="radio" name="gender" value="남"> 남</label>
+          <label><input type="radio" name="gender" value="여"> 여</label>
+        </td>
       </tr>
- <tr>
-  <td class="info-label">거주지역</td>
-  <td class="radio-group">
-    <label><input type="radio" name="region" value="부산"> 부산</label>
-    <label><input type="radio" name="region" value="울산"> 울산</label>
-    <label><input type="radio" name="region" value="경남"> 경남</label>
-  </td>
-</tr>
-<tr>
-  <td class="info-label">거주기간</td>
-  <td>
-    <input type="number" id="info-residence-years"
-           style="width:60px; padding:5px;" placeholder="10"> 년
-  </td>
-</tr>
+      <tr>
+        <td class="info-label">거주지역</td>
+        <td class="radio-group">
+          <label><input type="radio" name="region" value="부산"> 부산</label>
+          <label><input type="radio" name="region" value="울산"> 울산</label>
+          <label><input type="radio" name="region" value="경남"> 경남</label>
+        </td>
+      </tr>
+      <tr>
+        <td class="info-label">거주기간</td>
+        <td><input type="number" id="info-residence-years"
+                   style="width:60px; padding:5px;" placeholder="10"> 년</td>
+      </tr>
       <tr>
         <td class="info-label">직업</td>
         <td class="radio-group">
@@ -527,31 +630,25 @@
           <label><input type="radio" name="job" value="주부"> 주부</label>
           <label><input type="radio" name="job" value="프리랜서"> 프리랜서</label><br>
           <label><input type="radio" name="job" value="기타"> 기타</label>
-          <input type="text" id="info-job-etc"
-                 placeholder="기타 내용 입력"
+          <input type="text" id="info-job-etc" placeholder="기타 내용 입력"
                  style="width:120px; border:1px solid #ddd; padding:5px;">
         </td>
       </tr>
       <tr>
         <td class="info-label">휴대폰<br><small>(쿠폰 수령용)</small></td>
-        <td>
-          <input type="text" id="info-phone" class="info-input"
-                 placeholder="010-0000-0000">
-        </td>
+        <td><input type="text" id="info-phone" class="info-input"
+                   placeholder="010-0000-0000"></td>
       </tr>
-    
     </table>
   </div>
 
   <div class="footer">
-    <button type="button"
-            onclick="backToFirst()"
+    <button type="button" onclick="backToFirst()"
             style="background:#888; color:white; padding:12px 20px;
                    border-radius:30px; border:none; margin-bottom:10px;">
       이전 단계로 돌아가기
     </button><br>
-    <button type="button"
-            onclick="submitAll()"
+    <button type="button" onclick="submitAll()"
             style="background:var(--primary-color); color:white; padding:18px;
                    border-radius:40px; border:none; width:100%; max-width:400px;
                    font-weight:bold;">
@@ -562,40 +659,40 @@
 
 <script>
   const questions = [
-   "1. 전국 방송에서도 사투리를 자연스럽게 쓸 수 있어야 한다",
-"2. 사투리 방송에 대한 일정한 규제는 필요하다",
-"3. 사투리 방송의 증가는 지역 간 문화적 장벽이 될 수 있다",
-"4. 지역 출신이 아니라도 사투리 지역방송의 매력을 느낄 수 있다",
-"5. 방송에서 사투리를 쓰는 것은 지역감정을 부추길 수 있다",
-"6. 지역방송의 사투리 사용은 사라져가는 사투리를 보존하는 역할을 한다",
-"7. 지역방송의 사투리 사용은 우리말이 얼마나 다채로운지를 보여준다",
-"8. 지역방송은 다음 세자가 사투리를 자연스럽게 접할 수 있는 통로다",
-"9. 지역방송의 사투리 사용만으로는 사투리 소멸을 막기 어렵다",
-"10. 방송에서 표준어만 써야 한다는 규범은 구시대적이다",
-"11. 지역방송의 사투리 콘텐츠는 지역 문화 수호라는 점에서 중요하다",
-"12. 지역방송은 사투리 콘텐츠를 지금보다 더 늘릴 필요가 있다",
-"13. 사투리는 타 지역 방송과 차별화되는 우리 지역 방송만의 브랜드다",
-"14. 사투리를 잘 활용한 지역방송 콘텐츠는 유튜브 같은 플랫폼에서 경쟁력이 있다",
-"15. 사투리를 쓰는 지역방송은 지역민 이외의 시청자를 끌어들이기 어렵다",
-"16. 뉴스나 시사 프로그램에서 사투리를 쓰면 콘텐츠의 신뢰도가 떨어진다",
-"17. 사투리 방송은 전국 대상 광고주나 협찬사를 유치하는 데 불리하다",
-"18. 사투리를 쓰는 지역방송은 지역 광고 시장에서 강점이 될 수 있다",
-"19. 지역방송이라도 시청자 수요가 없다면 굳이 사투리 방송을 제작할 필요가 없다",
-"20. 사투리를 쓰는 진행자는 그 지역 출연자와 더 잘 소통할 수 있다",
-"21. 사투리가 방송에서 점점 사라지는 것 같아 아쉽다",
-"22. 지역방송에서 사투리를 들으면 지역 문화가 느껴진다",
-"23. 사투리를 쓰는 지역방송을 보면 지역민으로서의 자부심이 느껴진다",
-"24. 지역방송에서 사투리가 웃음 소재로만 활용되는 것 같아 불편하다",
-"25. 사투리 방송을 보면 내가 이 지역 사람이라는 게 새삼 느껴진다",
-"26. 사투리 방송을 보면 왠지 모르게 마음이 편안하다",
-"27. 사투리 방송은 같은 지역 사람끼리만 아는 즐거움이 있다",
-"28. 지역방송의 사투리 방송은 촌스러운 느낌이 든다",
-"29. 사투리가 쓰인 지역방송은 표준어 방송보다 몰입이 된다",
-"30. 사투리가 자연스럽게 나오는 지역방송은 보는 재미가 있다",
-"31. 지역방송의 사투리 콘텐츠가 SNS에서 화제가 되는 것이 반갑다",
-"32. 사투리가 많이 나오는 지역방송은 오래 보기가 부담스럽다",
-"33. 사투리가 나오는 지역방송은 분위기가 가볍게 느껴져 불편하다",
-"34. 사투리 방송이라는 이유만으로 지역방송을 챙겨보지는 않는다"
+    "1. 전국 방송에서도 사투리를 자연스럽게 쓸 수 있어야 한다",
+    "2. 사투리 방송에 대한 일정한 규제는 필요하다",
+    "3. 사투리 방송의 증가는 지역 간 문화적 장벽이 될 수 있다",
+    "4. 지역 출신이 아니라도 사투리 지역방송의 매력을 느낄 수 있다",
+    "5. 방송에서 사투리를 쓰는 것은 지역감정을 부추길 수 있다",
+    "6. 지역방송의 사투리 사용은 사라져가는 사투리를 보존하는 역할을 한다",
+    "7. 지역방송의 사투리 사용은 우리말이 얼마나 다채로운지를 보여준다",
+    "8. 지역방송은 다음 세대가 사투리를 자연스럽게 접할 수 있는 통로다",
+    "9. 지역방송의 사투리 사용만으로는 사투리 소멸을 막기 어렵다",
+    "10. 방송에서 표준어만 써야 한다는 규범은 구시대적이다",
+    "11. 지역방송의 사투리 콘텐츠는 지역 문화 수호라는 점에서 중요하다",
+    "12. 지역방송은 사투리 콘텐츠를 지금보다 더 늘릴 필요가 있다",
+    "13. 사투리는 타 지역 방송과 차별화되는 우리 지역 방송만의 브랜드다",
+    "14. 사투리를 잘 활용한 지역방송 콘텐츠는 유튜브 같은 플랫폼에서 경쟁력이 있다",
+    "15. 사투리를 쓰는 지역방송은 지역민 이외의 시청자를 끌어들이기 어렵다",
+    "16. 뉴스나 시사 프로그램에서 사투리를 쓰면 콘텐츠의 신뢰도가 떨어진다",
+    "17. 사투리 방송은 전국 대상 광고주나 협찬사를 유치하는 데 불리하다",
+    "18. 사투리를 쓰는 지역방송은 지역 광고 시장에서 강점이 될 수 있다",
+    "19. 지역방송이라도 시청자 수요가 없다면 굳이 사투리 방송을 제작할 필요가 없다",
+    "20. 사투리를 쓰는 진행자는 그 지역 출연자와 더 잘 소통할 수 있다",
+    "21. 사투리가 방송에서 점점 사라지는 것 같아 아쉽다",
+    "22. 지역방송에서 사투리를 들으면 지역 문화가 느껴진다",
+    "23. 사투리를 쓰는 지역방송을 보면 지역민으로서의 자부심이 느껴진다",
+    "24. 지역방송에서 사투리가 웃음 소재로만 활용되는 것 같아 불편하다",
+    "25. 사투리 방송을 보면 내가 이 지역 사람이라는 게 새삼 느껴진다",
+    "26. 사투리 방송을 보면 왠지 모르게 마음이 편안하다",
+    "27. 사투리 방송은 같은 지역 사람끼리만 아는 즐거움이 있다",
+    "28. 지역방송의 사투리 방송은 촌스러운 느낌이 든다",
+    "29. 사투리가 쓰인 지역방송은 표준어 방송보다 몰입이 된다",
+    "30. 사투리가 자연스럽게 나오는 지역방송은 보는 재미가 있다",
+    "31. 지역방송의 사투리 콘텐츠가 SNS에서 화제가 되는 것이 반갑다",
+    "32. 사투리가 많이 나오는 지역방송은 오래 보기가 부담스럽다",
+    "33. 사투리가 나오는 지역방송은 분위기가 가볍게 느껴져 불편하다",
+    "34. 사투리 방송이라는 이유만으로 지역방송을 챙겨보지는 않는다"
   ];
 
   const layout = [
@@ -608,9 +705,7 @@
   let scale = 0.6;
   let lastScale = 1;
   let lastDistance = 0;
-  let savedPersonalInfo = {};
   let savedReasons = {};
-
   let used = new Array(questions.length).fill(false);
 
   const board = document.getElementById('board');
@@ -618,7 +713,7 @@
     const col = document.createElement('div');
     col.className = 'column';
     col.dataset.score = item.s;
-    for (let i=0; i<item.n; i++) {
+    for (let i = 0; i < item.n; i++) {
       const slot = document.createElement('div');
       slot.className = 'slot';
       col.appendChild(slot);
@@ -629,6 +724,30 @@
     col.appendChild(label);
     board.appendChild(col);
   });
+
+  function goClipPage() {
+    document.getElementById('intro-page-1').classList.remove('active');
+    document.getElementById('intro-page-1').style.display = 'none';
+    document.getElementById('intro-page-2').classList.add('active');
+    document.getElementById('intro-page-2').style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+
+  function backToIntro() {
+    document.getElementById('intro-page-2').classList.remove('active');
+    document.getElementById('intro-page-2').style.display = 'none';
+    document.getElementById('intro-page-1').classList.add('active');
+    document.getElementById('intro-page-1').style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+
+  function startSurvey() {
+    document.getElementById('intro-page-2').classList.remove('active');
+    document.getElementById('intro-page-2').style.display = 'none';
+    document.getElementById('survey-page').classList.add('active');
+    document.getElementById('survey-page').style.display = 'block';
+    window.scrollTo(0, 0);
+  }
 
   function showCurrentCard() {
     if (used[currentQIdx]) {
@@ -642,11 +761,9 @@
       }
       currentQIdx = nextIdx;
     }
-
     const stack = document.getElementById('stack');
     const old = stack.querySelector('.q-card');
     if (old) old.remove();
-
     const card = document.createElement('div');
     card.className = 'q-card';
     card.textContent = questions[currentQIdx];
@@ -664,21 +781,18 @@
       startX = t.clientX;
       startY = t.clientY;
       initialRect = el.getBoundingClientRect();
-
       if (el.parentElement.classList.contains('slot')) {
         el.parentElement.classList.remove('occupied');
       }
       if (el.classList.contains('in-slot')) el.classList.add('dragging-small');
-
       el.style.position = 'fixed';
       el.style.width = initialRect.width + 'px';
       el.style.height = initialRect.height + 'px';
       el.style.left = initialRect.left + 'px';
       el.style.top  = initialRect.top  + 'px';
       el.style.zIndex = '5000';
-
       document.addEventListener('mousemove', onMove);
-      document.addEventListener('touchmove', onMove, {passive:false});
+      document.addEventListener('touchmove', onMove, {passive: false});
       document.addEventListener('mouseup', onEnd);
       document.addEventListener('touchend', onEnd);
     };
@@ -701,18 +815,14 @@
       document.removeEventListener('touchend', onEnd);
       el.classList.remove('dragging-small');
       document.querySelectorAll('.slot').forEach(s => s.classList.remove('highlight'));
-
       const target = findClosestSlot(t.clientX, t.clientY);
       const idx = parseInt(el.dataset.idx, 10);
-
       if (target) {
         const fromStack = el.parentElement.id === 'stack';
-
         target.appendChild(el);
         target.classList.add('occupied');
         el.className = 'q-card in-slot';
         el.style = "";
-
         if (fromStack) {
           used[idx] = true;
           const nextIdx = used.findIndex(v => !v);
@@ -736,7 +846,6 @@
         used[idx] = false;
         currentQIdx = idx;
       }
-
       updateStatus();
     };
 
@@ -749,10 +858,7 @@
           (sRect.left + sRect.width / 2) - mx,
           (sRect.top  + sRect.height / 2) - my
         );
-        if (dist < minDistance) {
-          minDistance = dist;
-          closest = slot;
-        }
+        if (dist < minDistance) { minDistance = dist; closest = slot; }
       });
       return closest;
     }
@@ -763,11 +869,7 @@
 
   function updateStatus() {
     const placed = document.querySelectorAll('.slot.occupied .q-card').length;
-    const remainingCards = 34 - placed;
-
-    document.getElementById('counter').textContent =
-      `남은 문항: ${remainingCards}/34`;
-
+    document.getElementById('counter').textContent = `남은 문항: ${34 - placed}/34`;
     const btn = document.getElementById('finish-btn');
     if (placed === 34) {
       btn.disabled = false;
@@ -781,189 +883,121 @@
   }
 
   function goFinalPage() {
-    const placed = document.querySelectorAll('.slot.occupied .q-card').length;
-    if (placed !== 34) {
+    if (document.querySelectorAll('.slot.occupied .q-card').length !== 34) {
       alert('모든 문항을 배치해 주세요.');
       return;
     }
-
     const container = document.getElementById('reason-container');
     const mapping = {"-4": "매우 비동의", "4": "매우 동의"};
     container.innerHTML = "";
-
-   Object.keys(mapping).forEach(score => {
-  const cards = document.querySelectorAll(`.column[data-score="${score}"] .q-card`);
-  cards.forEach(card => {
-    const qText = card.textContent;
-    const savedValue = savedReasons[qText] || "";
-    const div = document.createElement('div');
-    div.className = "reason-box";
-    
-    // 이 부분에서 색상 적용 범위를 분리합니다.
-    const colorStyle = score === "4" ? "color: var(--agree-color);" : "color: var(--disagree-color);";
-    
-    div.innerHTML = `
-      <div style="font-weight:bold; margin-bottom: 8px;">
-        <span style="${colorStyle}">[${mapping[score]}]</span>
-        <span style="color: #000;"> ${qText}</span>
-      </div>
-      <textarea class="reason-input" data-q="${qText}"
-                placeholder="이유를 입력해 주세요.">${savedValue}</textarea>
-    `;
-    container.appendChild(div);
-  });
-});
-
-    const sp = document.getElementById('survey-page');
-    const fp = document.getElementById('final-form-page');
-
-    sp.classList.remove('active');
-    sp.style.display = 'none';
-    fp.classList.add('active');
-    fp.style.display = 'block';
-
-    window.scrollTo(0,0);
+    Object.keys(mapping).forEach(score => {
+      document.querySelectorAll(`.column[data-score="${score}"] .q-card`).forEach(card => {
+        const qText = card.textContent;
+        const div = document.createElement('div');
+        div.className = "reason-box";
+        const colorStyle = score === "4" ? "color: var(--agree-color);" : "color: var(--disagree-color);";
+        div.innerHTML = `
+          <div style="font-weight:bold; margin-bottom: 8px;">
+            <span style="${colorStyle}">[${mapping[score]}]</span>
+            <span style="color: #000;"> ${qText}</span>
+          </div>
+          <textarea class="reason-input" data-q="${qText}"
+                    placeholder="이유를 입력해 주세요.">${savedReasons[qText] || ""}</textarea>
+        `;
+        container.appendChild(div);
+      });
+    });
+    document.getElementById('survey-page').classList.remove('active');
+    document.getElementById('survey-page').style.display = 'none';
+    document.getElementById('final-form-page').classList.add('active');
+    document.getElementById('final-form-page').style.display = 'block';
+    window.scrollTo(0, 0);
   }
 
   function backToFirst() {
     document.querySelectorAll('.reason-input').forEach(input => {
       savedReasons[input.dataset.q] = input.value;
     });
-
-    const fp = document.getElementById('final-form-page');
-    const sp = document.getElementById('survey-page');
-
-    fp.classList.remove('active');
-    fp.style.display = 'none';
-    sp.classList.add('active');
-    sp.style.display = 'block';
-
-    window.scrollTo(0,0);
+    document.getElementById('final-form-page').classList.remove('active');
+    document.getElementById('final-form-page').style.display = 'none';
+    document.getElementById('survey-page').classList.add('active');
+    document.getElementById('survey-page').style.display = 'block';
+    window.scrollTo(0, 0);
   }
 
   function submitAll() {
-  // 필수 항목 체크
-  const year = document.getElementById('info-year').value;
-  const gender = document.querySelector('input[name="gender"]:checked');
-  const region = document.querySelector('input[name="region"]:checked');
-  const residenceYears = document.getElementById('info-residence-years').value;
-  const job = document.querySelector('input[name="job"]:checked');
-  const phone = document.getElementById('info-phone').value;
+    const year = document.getElementById('info-year').value;
+    const gender = document.querySelector('input[name="gender"]:checked');
+    const region = document.querySelector('input[name="region"]:checked');
+    const residenceYears = document.getElementById('info-residence-years').value;
+    const job = document.querySelector('input[name="job"]:checked');
+    const phone = document.getElementById('info-phone').value;
 
-  // 필수 항목 검증
-  if (!year) {
-    alert('출생연도를 입력해주세요.');
-    return;
+    if (!year)          { alert('출생연도를 입력해주세요.');   return; }
+    if (!gender)        { alert('성별을 선택해주세요.');        return; }
+    if (!region)        { alert('거주지역을 선택해주세요.');    return; }
+    if (!residenceYears){ alert('거주기간을 입력해주세요.');    return; }
+    if (!job)           { alert('직업을 선택해주세요.');        return; }
+    if (!phone)         { alert('휴대폰 번호를 입력해주세요.'); return; }
+
+    let allFilled = true;
+    document.querySelectorAll('.reason-input').forEach(input => {
+      if (!input.value.trim()) allFilled = false;
+    });
+    if (!allFilled) { alert('양극단 배치 이유를 모두 입력해주세요.'); return; }
+
+    document.querySelectorAll('.reason-input').forEach(input => {
+      savedReasons[input.dataset.q] = input.value;
+    });
+
+    let sortData = "";
+    document.querySelectorAll('.slot.occupied .q-card').forEach(c => {
+      sortData += `${c.textContent.split('.')[0]}:${c.parentElement.parentElement.dataset.score}, `;
+    });
+
+    const personalInfo =
+      `출생:19${year} / 성별:${gender.value} / 거주지역:${region.value} / ` +
+      `거주기간:${residenceYears}년 / 직업:${job.value}(${document.getElementById('info-job-etc').value}) / ` +
+      `연락처:${phone}`;
+
+    document.getElementById('g-entry-1').value = sortData;
+    document.getElementById('g-entry-2').value =
+      Array.from(document.querySelectorAll('.reason-input'))
+           .map(i => `${i.dataset.q}:${i.value}`).join('\n');
+    document.getElementById('g-entry-3').value = personalInfo;
+
+    document.getElementById('google-submit-form').submit();
+
+    setTimeout(() => {
+      alert("성공적으로 제출되었습니다. 감사합니다!");
+      localStorage.setItem('survey_done_tv80', 'true');
+      setTimeout(() => location.reload(), 1500);
+    }, 1000);
   }
-  if (!gender) {
-    alert('성별을 선택해주세요.');
-    return;
-  }
-  if (!region) {
-    alert('거주지역을 선택해주세요.');
-    return;
-  }
-  if (!residenceYears) {
-    alert('거주기간을 입력해주세요.');
-    return;
-  }
-  if (!job) {
-    alert('직업을 선택해주세요.');
-    return;
-  }
-  if (!phone) {
-    alert('휴대폰 번호를 입력해주세요.');
-    return;
-  }
-
-  // 양극단 이유 입력 체크
-  const reasonInputs = document.querySelectorAll('.reason-input');
-  let allFilled = true;
-  reasonInputs.forEach(input => {
-    if (!input.value.trim()) {
-      allFilled = false;
-    }
-  });
-  
-  if (!allFilled) {
-    alert('양극단 배치 이유를 모두 입력해주세요.');
-    return;
-  }
-
-  Array.from(document.querySelectorAll('.reason-input')).forEach(input => {
-    savedReasons[input.dataset.q] = input.value;
-  });
-
-  let sortData = "";
-  document.querySelectorAll('.slot.occupied .q-card').forEach(c => {
-    sortData += `${c.textContent.split('.')[0]}:${c.parentElement.parentElement.dataset.score}, `;
-  });
-
-  const genderValue = gender.value;
-  const regionValue = region.value;
-  const jobValue = job.value;
-  const jobEtc = document.getElementById('info-job-etc').value;
-
-  const personalInfo =
-    `출생:19${year} / ` +
-    `성별:${genderValue} / ` +
-    `거주지역:${regionValue} / ` +
-    `거주기간:${residenceYears}년 / ` +
-    `직업:${jobValue}(${jobEtc}) / ` +
-    `연락처:${phone}`;
-   
-  document.getElementById('g-entry-1').value = sortData;
-  document.getElementById('g-entry-2').value =
-    Array.from(document.querySelectorAll('.reason-input'))
-         .map(i => `${i.dataset.q}:${i.value}`).join('\n');
-  document.getElementById('g-entry-3').value = personalInfo;
-
-  console.log('제출 데이터:', {
-    sortData,
-    reasons: document.getElementById('g-entry-2').value,
-    personalInfo
-  });
-
-  document.getElementById('google-submit-form').submit();
-  
-  setTimeout(() => {
-    alert("성공적으로 제출되었습니다. 감사합니다!");
-    localStorage.setItem('survey_done_tv80', 'true');
-    setTimeout(() => location.reload(), 1500);
-  }, 1000);
-}
 
   document.getElementById('next-btn').addEventListener('click', () => {
     if (!used.some(v => !v)) return;
-    let idx = currentQIdx;
-    let safety = 0;
-    do {
-      idx = (idx + 1) % questions.length;
-      safety++;
-    } while (used[idx] && safety < questions.length);
+    let idx = currentQIdx, safety = 0;
+    do { idx = (idx + 1) % questions.length; safety++; }
+    while (used[idx] && safety < questions.length);
     currentQIdx = idx;
     showCurrentCard();
   });
 
   document.getElementById('prev-btn').addEventListener('click', () => {
     if (!used.some(v => !v)) return;
-    let idx = currentQIdx;
-    let safety = 0;
-    do {
-      idx = (idx - 1 + questions.length) % questions.length;
-      safety++;
-    } while (used[idx] && safety < questions.length);
+    let idx = currentQIdx, safety = 0;
+    do { idx = (idx - 1 + questions.length) % questions.length; safety++; }
+    while (used[idx] && safety < questions.length);
     currentQIdx = idx;
     showCurrentCard();
   });
 
   document.getElementById('zoom-in-btn').addEventListener('click', () => {
-    scale = Math.min(scale + 0.1, 1.1);
-    updateScale();
+    scale = Math.min(scale + 0.1, 1.1); updateScale();
   });
   document.getElementById('zoom-out-btn').addEventListener('click', () => {
-    scale = Math.max(scale - 0.1, 0.6);
-    updateScale();
+    scale = Math.max(scale - 0.1, 0.6); updateScale();
   });
 
   document.addEventListener('touchstart', function(e) {
@@ -979,12 +1013,11 @@
   document.addEventListener('touchmove', function(e) {
     if (e.touches.length === 2) {
       e.preventDefault();
-      const currentDistance = Math.hypot(
+      const d = Math.hypot(
         e.touches[1].pageX - e.touches[0].pageX,
         e.touches[1].pageY - e.touches[0].pageY
       );
-      scale = lastScale * (currentDistance / lastDistance);
-      scale = Math.min(Math.max(scale, 0.6), 1.1);
+      scale = Math.min(Math.max(lastScale * (d / lastDistance), 0.6), 1.1);
       updateScale();
     }
   }, { passive: false });
@@ -993,36 +1026,20 @@
     const wrapper = document.getElementById('pyramid-zoom-wrapper');
     const inner = document.querySelector('.board-inner');
     const boardContainer = document.querySelector('.board-container');
-
     wrapper.style.transformOrigin = "top left";
     wrapper.style.transform = `scale(${scale})`;
-
-    const originalWidth  = boardContainer.offsetWidth;
-    const originalHeight = wrapper.offsetHeight;
-    const scaledWidth  = originalWidth * scale;
-    const scaledHeight = originalHeight * scale;
-
+    const scaledWidth  = boardContainer.offsetWidth * scale;
+    const scaledHeight = wrapper.offsetHeight * scale;
     inner.style.width  = scaledWidth + "px";
     inner.style.height = (scaledHeight + 50) + "px";
-
-    const screenWidth = document.querySelector('.board-wrapper').clientWidth;
-
-    inner.style.marginLeft  = "auto";
+    inner.style.marginLeft = "auto";
     inner.style.marginRight = "auto";
-
-    if (scaledWidth > screenWidth) {
-      inner.style.paddingLeft  = "20px";
-      inner.style.paddingRight = "20px";
-    } else {
-      inner.style.paddingLeft  = "0";
-      inner.style.paddingRight = "0";
-    }
+    const screenWidth = document.querySelector('.board-wrapper').clientWidth;
+    inner.style.paddingLeft  = scaledWidth > screenWidth ? "20px" : "0";
+    inner.style.paddingRight = scaledWidth > screenWidth ? "20px" : "0";
   }
 
-  // 초기 카드 표시
   showCurrentCard();
 </script>
 </body>
 </html>
-
-
