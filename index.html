@@ -148,12 +148,14 @@
       overflow-y: visible;
       touch-action: auto;
       -webkit-overflow-scrolling: touch;
+      text-align: center;
     }
     .board-inner {
-      display: block;
+      display: inline-block;
       margin: 0 auto;
       padding: 20px;
       box-sizing: content-box;
+      text-align: center;
     }
 
     .zoom-control {
@@ -176,7 +178,7 @@
 
     #pyramid-zoom-wrapper {
       display: inline-block;
-      transform-origin: top left;
+      transform-origin: top center;
       transition: transform 0.1s ease;
       text-align: center;
     }
@@ -1046,18 +1048,10 @@
   function updateScale() {
     const wrapper = document.getElementById('pyramid-zoom-wrapper');
     const inner = document.querySelector('.board-inner');
-    const boardContainer = document.querySelector('.board-container');
-    wrapper.style.transformOrigin = "top left";
-    wrapper.style.transform = `scale(${scale})`;
-    const scaledWidth  = boardContainer.offsetWidth * scale;
     const scaledHeight = wrapper.offsetHeight * scale;
-    inner.style.width  = scaledWidth + "px";
+    wrapper.style.transformOrigin = "top center";
+    wrapper.style.transform = `scale(${scale})`;
     inner.style.height = (scaledHeight + 50) + "px";
-    inner.style.marginLeft = "auto";
-    inner.style.marginRight = "auto";
-    const screenWidth = document.querySelector('.board-wrapper').clientWidth;
-    inner.style.paddingLeft  = scaledWidth > screenWidth ? "20px" : "0";
-    inner.style.paddingRight = scaledWidth > screenWidth ? "20px" : "0";
   }
 
   showCurrentCard();
