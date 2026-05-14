@@ -23,7 +23,6 @@
       user-select: none;
     }
 
-    /* 페이지 공통 */
     #intro-page-1,
     #intro-page-2,
     #survey-page,
@@ -373,7 +372,6 @@
     .nav-btn.left  { background: #bdc3c7; }
     .nav-btn.right { background: var(--accent-color); }
 
-    /* 인트로 버튼 공통 */
     #start-survey-btn,
     #start-survey-btn2 {
       background: var(--accent-color);
@@ -391,6 +389,17 @@
     }
     #start-survey-btn:active,
     #start-survey-btn2:active { opacity: 0.85; }
+
+    /* survey-page 숨김 상태 (배치 유지용) */
+    #survey-page.hidden-preserve {
+      display: block !important;
+      visibility: hidden;
+      position: absolute;
+      pointer-events: none;
+      top: 0;
+      left: 0;
+      width: 100%;
+    }
   </style>
 </head>
 <body>
@@ -425,32 +434,21 @@
         일부 기업 PC는 보안 문제로 설문 결과 전송이 어려울 수 있으니 개인 PC나 스마트폰 사용을 권장합니다.
       </p>
       <p style="line-height: 1.8; margin: 0 0 16px; font-size: 1rem; color: #000;">
-        본 설문은 지역방송의 사투리에 대한 인식을 확인하기 위한 것입니다.<br>
-        34개의 진술문을 읽고, 동의 정도에 따라 진술문을 드래그하여 아래 피라미드 칸을 모두 채워주십시오.<br>
-        <span style="color: #007bff;">피라미드의 <b>가로축</b>은 오른쪽으로 갈수록 '동의함'을,
-        왼쪽으로 갈수록 '동의하지 않음'을 의미하며,
-        세로축은 위아래 위치와 관계없이 동일한 동의 정도를 뜻합니다.</span><br>
-        본 설문은 정답이 없으므로, 사회적으로 바람직한 답변보다는 귀하의 솔직한 의견을 기록해 주시기를 부탁드립니다.<br>
-        설문 항목을 빠짐없이 작성해주신 분들께 감사의 의미로 <b style="color: #007bff;">스타벅스 쿠폰</b>을 보내드립니다.
-        기프티콘 발송을 위해 연락처를 정확히 기재해 주시기 바랍니다.
+        본 설문은 지역방송의 사투리 콘텐츠에 대한 지역주민의 인식을 확인하기 위한 것입니다.
+      </p>
+      <h3 style="margin: 0 0 8px; font-size: 1rem; color: var(--primary-color);
+                 border-left: 4px solid var(--accent-color); padding-left: 10px;">
+        본 연구에서 '사투리 방송'이란?
+      </h3>
+      <p style="font-size: 0.95rem; line-height: 1.8; margin: 0 0 16px; color: #333;">
+        진행자 혹은 주요 출연자가 <b>경상도 방언을 의도적·전면적으로 사용</b>하여
+        제작된 방송 콘텐츠를 의미합니다.<br>
+        다음 화면에서 샘플 영상을 확인하신 후 설문에 참여해 주세요.
       </p>
       <p style="font-size: 0.9rem; color: #666; border-top: 1px solid #eee;
                 padding-top: 10px; line-height: 1.6; margin: 0;">
         답해주신 의견은 통계법 제33조에 따라 비밀이 보장되며, 연구 목적 외에는 절대 활용되지 않습니다.<br>
         연구책임자: 강승화 (010-8545-2338 / 00mandoo@naver.com)
-      </p>
-    </div>
-
-    <div style="background: white; border-radius: 12px; padding: 20px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 16px;">
-      <h3 style="margin: 0 0 10px; font-size: 1rem; color: var(--primary-color);
-                 border-left: 4px solid var(--accent-color); padding-left: 10px;">
-        본 연구에서 '사투리 방송'이란?
-      </h3>
-      <p style="font-size: 0.95rem; line-height: 1.8; margin: 0; color: #333;">
-        진행자 혹은 주요 출연자가 <b>경상도 방언을 의도적·전면적으로 사용</b>하여
-        제작된 방송 콘텐츠를 의미합니다.<br>
-        다음 화면에서 샘플 영상을 확인하신 후 설문에 참여해 주세요.
       </p>
     </div>
 
@@ -484,6 +482,7 @@
       <div style="position: relative; padding-bottom: 56.25%; height: 0;
                   overflow: hidden; border-radius: 8px;">
         <iframe
+          id="sample-video-iframe"
           src="https://www.youtube.com/embed/TDsuzgouj4g"
           title="MBC경남 으샤으샤 샘플 클립"
           frameborder="0"
@@ -524,19 +523,11 @@
       일부 기업 PC는 보안 문제로 설문 결과 전송이 어려울 수 있으니 개인 PC나 스마트폰 사용을 권장합니다.
     </p>
     <p style="line-height: 1.8; margin-top: 0; margin-bottom: 15px; font-size: 1rem; color: #000;">
-      본 설문은 지역방송의 사투리에 대한 인식을 확인하기 위한 것입니다.<br>
       34개의 진술문을 읽고, 동의 정도에 따라 진술문을 드래그하여 아래 피라미드 칸을 모두 채워주십시오.<br>
-      <span style="color: #007bff;">피라미드의 <b>가로축</b>은 오른쪽으로 갈수록 '동의함'을,
-      왼쪽으로 갈수록 '동의하지 않음'을 의미하며,
-      세로축은 위아래 위치와 관계없이 동일한 동의 정도를 뜻합니다.</span><br>
-      본 설문은 정답이 없으므로, 사회적으로 바람직한 답변보다는 귀하의 솔직한 의견을 기록해 주시기를 부탁드립니다.<br>
-      설문 항목을 빠짐없이 작성해주신 분들께 감사의 의미로 <b style="color: #007bff;">스타벅스 쿠폰</b>을 보내드립니다.
-      기프티콘 발송을 위해 연락처를 정확히 기재해 주시기 바랍니다.
-    </p>
-    <p style="font-size: 0.9rem; color: #666; border-top: 1px solid #eee;
-              padding-top: 10px; line-height: 1.6; margin-top: 0;">
-      답해주신 의견은 통계법 제33조에 따라 비밀이 보장되며, 연구 목적 외에는 절대 활용되지 않습니다.<br>
-      연구책임자: 강승화 (010-8545-2338 / 00mandoo@naver.com)
+      피라미드의 가로축은 <span style="color: #27ae60;">오른쪽으로 갈수록 '동의함'</span>을,
+      <span style="color: #e74c3c;">왼쪽으로 갈수록 '동의하지 않음'</span>을 의미하며,
+      세로축은 위아래 위치와 관계없이 동일한 동의 정도를 뜻합니다.<br>
+      본 설문은 정답이 없으므로, 사회적으로 바람직한 답변보다는 귀하의 솔직한 의견을 기록해 주시기를 부탁드립니다.
     </p>
   </div>
 </header>
@@ -572,6 +563,12 @@
       </div>
     </div>
     <div class="footer">
+      <button type="button" onclick="backToClip()"
+              style="background:#888; color:white; padding:12px 20px;
+                     border-radius:30px; border:none; margin-bottom:12px;
+                     font-size:0.95rem; font-weight:600; cursor:pointer;">
+        ← 샘플 영상으로 돌아가기
+      </button><br>
       <button id="finish-btn" type="button" disabled onclick="goFinalPage()">
         모든 문항을 배치해 주세요
       </button>
@@ -742,10 +739,25 @@
   }
 
   function startSurvey() {
+    // ★ 영상 정지
+    const iframe = document.getElementById('sample-video-iframe');
+    if (iframe) iframe.src = '';
+
     document.getElementById('intro-page-2').classList.remove('active');
     document.getElementById('intro-page-2').style.display = 'none';
     document.getElementById('survey-page').classList.add('active');
     document.getElementById('survey-page').style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+
+  function backToClip() {
+    document.getElementById('survey-page').classList.remove('active');
+    document.getElementById('survey-page').style.display = 'none';
+    // 영상 다시 로드
+    const iframe = document.getElementById('sample-video-iframe');
+    if (iframe) iframe.src = 'https://www.youtube.com/embed/TDsuzgouj4g';
+    document.getElementById('intro-page-2').classList.add('active');
+    document.getElementById('intro-page-2').style.display = 'block';
     window.scrollTo(0, 0);
   }
 
@@ -887,6 +899,7 @@
       alert('모든 문항을 배치해 주세요.');
       return;
     }
+
     const container = document.getElementById('reason-container');
     const mapping = {"-4": "매우 비동의", "4": "매우 동의"};
     container.innerHTML = "";
@@ -907,8 +920,12 @@
         container.appendChild(div);
       });
     });
-    document.getElementById('survey-page').classList.remove('active');
-    document.getElementById('survey-page').style.display = 'none';
+
+    // ★ survey-page: display:none 대신 visibility:hidden → 슬롯 배치 유지
+    const surveyPage = document.getElementById('survey-page');
+    surveyPage.classList.remove('active');
+    surveyPage.classList.add('hidden-preserve');
+
     document.getElementById('final-form-page').classList.add('active');
     document.getElementById('final-form-page').style.display = 'block';
     window.scrollTo(0, 0);
@@ -918,10 +935,14 @@
     document.querySelectorAll('.reason-input').forEach(input => {
       savedReasons[input.dataset.q] = input.value;
     });
+
+    // ★ survey-page 복원
+    const surveyPage = document.getElementById('survey-page');
+    surveyPage.classList.remove('hidden-preserve');
+    surveyPage.classList.add('active');
+
     document.getElementById('final-form-page').classList.remove('active');
     document.getElementById('final-form-page').style.display = 'none';
-    document.getElementById('survey-page').classList.add('active');
-    document.getElementById('survey-page').style.display = 'block';
     window.scrollTo(0, 0);
   }
 
