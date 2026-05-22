@@ -1088,11 +1088,11 @@
 
   // ─── 줌 컨트롤 ───────────────────────────────────────────────────
   document.getElementById('zoom-in-btn').addEventListener('click', () => {
-    scale = Math.min(scale + 0.1, 1.1);
+    scale = Math.min(scale + 0.1, 2.0);
     updateScale();
   });
   document.getElementById('zoom-out-btn').addEventListener('click', () => {
-    scale = Math.max(scale - 0.1, 0.6);
+    scale = Math.max(scale - 0.1, 0.4);
     updateScale();
   });
 
@@ -1114,7 +1114,7 @@
         e.touches[1].pageX - e.touches[0].pageX,
         e.touches[1].pageY - e.touches[0].pageY
       );
-      scale = Math.min(Math.max(lastScale * (d / lastDistance), 0.6), 1.1);
+      scale = Math.min(Math.max(lastScale * (d / lastDistance), 0.4), 2.0);
       updateScale();
     }
   }, { passive: false });
