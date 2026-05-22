@@ -764,14 +764,24 @@
   }
 
   function startSurvey() {
-    const iframe = document.getElementById('sample-video-iframe');
-    if (iframe) iframe.src = '';
-    document.getElementById('intro-page-2').classList.remove('active');
-    document.getElementById('intro-page-2').style.display = 'none';
-    document.getElementById('survey-page').classList.add('active');
-    document.getElementById('survey-page').style.display = 'block';
-    window.scrollTo(0, 0);
-  }
+  const iframe = document.getElementById('sample-video-iframe');
+  if (iframe) iframe.src = '';
+  document.getElementById('intro-page-2').classList.remove('active');
+  document.getElementById('intro-page-2').style.display = 'none';
+  document.getElementById('survey-page').classList.add('active');
+  document.getElementById('survey-page').style.display = 'block';
+  window.scrollTo(0, 0);
+     setTimeout(() => {
+    const wrapper = document.getElementById('pyramid-zoom-wrapper');
+    const boardWrapper = document.querySelector('.board-wrapper');
+    const naturalWidth = wrapper.offsetWidth;
+    const availableWidth = boardWrapper.clientWidth - 40;
+    const autoScale = Math.min(availableWidth / naturalWidth, 1.0);
+    scale = Math.max(autoScale, 0.4);
+    updateScale();
+  }, 50);
+}
+  
 
   function backToClip() {
     document.getElementById('survey-page').classList.remove('active');
@@ -1150,17 +1160,6 @@ function updateScale() {
     boardWrapper.style.alignItems = 'center';
   }
 }
-
-  // ─── 초기 실행 ───────────────────────────────────────────────────
-   window.addEventListener('load', () => {
-    const wrapper = document.getElementById('pyramid-zoom-wrapper');
-    const boardWrapper = document.querySelector('.board-wrapper');
-    const naturalWidth = wrapper.offsetWidth;
-    const availableWidth = boardWrapper.clientWidth - 40;
-    const autoScale = Math.min(availableWidth / naturalWidth, 1.0);
-    scale = Math.max(autoScale, 0.4);
-    updateScale();
-  });
 
   showCurrentCard();
 </script>
