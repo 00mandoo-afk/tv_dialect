@@ -125,6 +125,8 @@
       touch-action: none;
       position: absolute;
       z-index: 3000;
+      -webkit-user-select: none;
+      user-select: none;
     }
     .q-card.in-slot,
     .q-card.dragging-small {
@@ -138,6 +140,12 @@
       justify-content: center;
       top: 0 !important;
       left: 0 !important;
+    }
+
+    .q-card.is-dragging {
+      cursor: grabbing;
+      opacity: 0.9;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
     }
 
     .board-wrapper {
@@ -392,7 +400,6 @@
     #start-survey-btn:active,
     #start-survey-btn2:active { opacity: 0.85; }
 
-    /* survey-page 숨김 상태 (배치 유지용) */
     #survey-page.hidden-preserve {
       display: block !important;
       visibility: hidden;
@@ -532,7 +539,6 @@
       <span style="color: #e74c3c;">왼쪽으로 갈수록 '동의하지 않음'</span>을 의미하며,
       세로축은 위아래 위치와 관계없이 동일한 동의 정도를 뜻합니다.<br>
       본 설문은 정답이 없으므로, 사회적으로 바람직한 답변보다는 귀하의 솔직한 의견을 기록해 주시기를 부탁드립니다. 
-      
       <br> 설문 항목을 빠짐없이 작성해주신 분들께 감사의 의미로 <b style="color: #007bff;">커피 쿠폰</b>을 보내드립니다. 기프티콘 발송을 위해 연락처를 정확히 기재해 주시기 바랍니다.
     </p>
   </div>
@@ -711,6 +717,7 @@
   let savedReasons = {};
   let used = new Array(questions.length).fill(false);
 
+  // ─── 피라미드 보드 생성 ───────────────────────────────────────────
   const board = document.getElementById('board');
   layout.forEach(item => {
     const col = document.createElement('div');
@@ -728,6 +735,7 @@
     board.appendChild(col);
   });
 
+  // ─── 페이지 전환 함수 ─────────────────────────────────────────────
   function goClipPage() {
     document.getElementById('intro-page-1').classList.remove('active');
     document.getElementById('intro-page-1').style.display = 'none';
@@ -745,10 +753,8 @@
   }
 
   function startSurvey() {
-    // ★ 영상 정지
     const iframe = document.getElementById('sample-video-iframe');
     if (iframe) iframe.src = '';
-
     document.getElementById('intro-page-2').classList.remove('active');
     document.getElementById('intro-page-2').style.display = 'none';
     document.getElementById('survey-page').classList.add('active');
@@ -759,7 +765,6 @@
   function backToClip() {
     document.getElementById('survey-page').classList.remove('active');
     document.getElementById('survey-page').style.display = 'none';
-    // 영상 다시 로드
     const iframe = document.getElementById('sample-video-iframe');
     if (iframe) iframe.src = 'https://www.youtube.com/embed/TDsuzgouj4g';
     document.getElementById('intro-page-2').classList.add('active');
@@ -767,6 +772,7 @@
     window.scrollTo(0, 0);
   }
 
+  // ─── 카드 표시 ────────────────────────────────────────────────────
   function showCurrentCard() {
     if (used[currentQIdx]) {
       const nextIdx = used.findIndex(v => !v);
@@ -791,57 +797,94 @@
     updateStatus();
   }
 
+  // ─── 드래그 앤 드롭 (모바일 수정 핵심) ───────────────────────────
   function makeDraggable(el) {
-    let startX, startY, initialRect;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+    let isDragging = false;
 
     const onStart = (e) => {
+      if (e.touches && e.touches.length > 1) return;
+
+      isDragging = true;
       const t = e.type.includes('touch') ? e.touches[0] : e;
-      startX = t.clientX;
-      startY = t.clientY;
-      initialRect = el.getBoundingClientRect();
-      if (el.parentElement.classList.contains('slot')) {
+
+      const rect = el.getBoundingClientRect();
+
+      // 손가락(마우스)이 카드 안 어느 위치를 잡았는지 오프셋 기록
+      dragOffsetX = t.clientX - rect.left;
+      dragOffsetY = t.clientY - rect.top;
+
+      if (el.parentElement && el.parentElement.classList.contains('slot')) {
         el.parentElement.classList.remove('occupied');
       }
-      if (el.classList.contains('in-slot')) el.classList.add('dragging-small');
+
+      el.classList.add('is-dragging');
+      if (el.classList.contains('in-slot')) {
+        el.classList.remove('in-slot');
+      }
       el.style.position = 'fixed';
-      el.style.width = initialRect.width + 'px';
-      el.style.height = initialRect.height + 'px';
-      el.style.left = initialRect.left + 'px';
-      el.style.top  = initialRect.top  + 'px';
-      el.style.zIndex = '5000';
+      el.style.width = '260px';
+      el.style.height = '';
+      el.style.fontSize = '14px';
+      el.style.padding = '10px';
+      el.style.left = (t.clientX - dragOffsetX) + 'px';
+      el.style.top  = (t.clientY - dragOffsetY) + 'px';
+      el.style.zIndex = '9999';
+      el.style.pointerEvents = 'none';
+
+      // 드래그 중 페이지 스크롤 방지
+      document.body.style.overflow = 'hidden';
+
       document.addEventListener('mousemove', onMove);
-      document.addEventListener('touchmove', onMove, {passive: false});
+      document.addEventListener('touchmove', onMove, { passive: false });
       document.addEventListener('mouseup', onEnd);
       document.addEventListener('touchend', onEnd);
     };
 
     const onMove = (e) => {
+      if (!isDragging) return;
       e.preventDefault();
       const t = e.type.includes('touch') ? e.touches[0] : e;
-      el.style.left = initialRect.left + (t.clientX - startX) + 'px';
-      el.style.top  = initialRect.top  + (t.clientY - startY) + 'px';
+
+      // 손가락 위치 - 오프셋 = 카드 좌상단 위치
+      el.style.left = (t.clientX - dragOffsetX) + 'px';
+      el.style.top  = (t.clientY - dragOffsetY) + 'px';
+
       document.querySelectorAll('.slot').forEach(s => s.classList.remove('highlight'));
       const target = findClosestSlot(t.clientX, t.clientY);
       if (target) target.classList.add('highlight');
     };
 
     const onEnd = (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+
       const t = e.type.includes('touch') ? e.changedTouches[0] : e;
+
       document.removeEventListener('mousemove', onMove);
       document.removeEventListener('touchmove', onMove);
       document.removeEventListener('mouseup', onEnd);
       document.removeEventListener('touchend', onEnd);
-      el.classList.remove('dragging-small');
+
+      document.body.style.overflow = '';
+
+      el.classList.remove('is-dragging');
+      el.style.pointerEvents = '';
       document.querySelectorAll('.slot').forEach(s => s.classList.remove('highlight'));
+
       const target = findClosestSlot(t.clientX, t.clientY);
       const idx = parseInt(el.dataset.idx, 10);
+
       if (target) {
-        const fromStack = el.parentElement.id === 'stack';
+        const wasInStack = el._fromStack;
         target.appendChild(el);
         target.classList.add('occupied');
+
         el.className = 'q-card in-slot';
-        el.style = "";
-        if (fromStack) {
+        el.style.cssText = '';
+
+        if (wasInStack) {
           used[idx] = true;
           const nextIdx = used.findIndex(v => !v);
           if (nextIdx !== -1) {
@@ -854,37 +897,56 @@
           }
         }
       } else {
-        if (el.parentElement.classList.contains('slot')) {
-          el.parentElement.classList.remove('occupied');
+        const stack = document.getElementById('stack');
+
+        const existingCard = stack.querySelector('.q-card');
+        if (existingCard && existingCard !== el) {
+          existingCard.remove();
         }
-        document.getElementById('stack').appendChild(el);
+
+        stack.appendChild(el);
         el.className = 'q-card';
-        el.style = "";
+        el.style.cssText = '';
         el.style.position = 'absolute';
+
         used[idx] = false;
         currentQIdx = idx;
       }
+
+      el._fromStack = false;
       updateStatus();
     };
 
-    function findClosestSlot(mx, my) {
-      let closest = null;
-      let minDistance = 120;
-      document.querySelectorAll('.slot:not(.occupied)').forEach(slot => {
-        const sRect = slot.getBoundingClientRect();
-        const dist = Math.hypot(
-          (sRect.left + sRect.width / 2) - mx,
-          (sRect.top  + sRect.height / 2) - my
-        );
-        if (dist < minDistance) { minDistance = dist; closest = slot; }
-      });
-      return closest;
-    }
+    el._fromStack = el.parentElement && el.parentElement.id === 'stack';
 
-    el.addEventListener('mousedown', onStart);
-    el.addEventListener('touchstart', onStart);
+    el.addEventListener('mousedown', (e) => {
+      el._fromStack = el.parentElement && el.parentElement.id === 'stack';
+      onStart(e);
+    });
+    el.addEventListener('touchstart', (e) => {
+      el._fromStack = el.parentElement && el.parentElement.id === 'stack';
+      onStart(e);
+    }, { passive: false });
   }
 
+  // ─── 가장 가까운 빈 슬롯 찾기 ────────────────────────────────────
+  function findClosestSlot(mx, my) {
+    let closest = null;
+    let minDistance = 120;
+    document.querySelectorAll('.slot:not(.occupied)').forEach(slot => {
+      const sRect = slot.getBoundingClientRect();
+      const cx = sRect.left + sRect.width  / 2;
+      const cy = sRect.top  + sRect.height / 2;
+      const dist = Math.hypot(cx - mx, cy - my);
+      if (dist < minDistance) {
+        minDistance = dist;
+        closest = slot;
+      }
+    });
+    return closest;
+  }
+
+  // ─── 상태 업데이트 ────────────────────────────────────────────────
   function updateStatus() {
     const placed = document.querySelectorAll('.slot.occupied .q-card').length;
     document.getElementById('counter').textContent = `남은 문항: ${34 - placed}/34`;
@@ -900,6 +962,7 @@
     }
   }
 
+  // ─── 최종 페이지 이동 ─────────────────────────────────────────────
   function goFinalPage() {
     if (document.querySelectorAll('.slot.occupied .q-card').length !== 34) {
       alert('모든 문항을 배치해 주세요.');
@@ -927,7 +990,6 @@
       });
     });
 
-    // ★ survey-page: display:none 대신 visibility:hidden → 슬롯 배치 유지
     const surveyPage = document.getElementById('survey-page');
     surveyPage.classList.remove('active');
     surveyPage.classList.add('hidden-preserve');
@@ -942,7 +1004,6 @@
       savedReasons[input.dataset.q] = input.value;
     });
 
-    // ★ survey-page 복원
     const surveyPage = document.getElementById('survey-page');
     surveyPage.classList.remove('hidden-preserve');
     surveyPage.classList.add('active');
@@ -952,20 +1013,21 @@
     window.scrollTo(0, 0);
   }
 
+  // ─── 최종 제출 ────────────────────────────────────────────────────
   function submitAll() {
-    const year = document.getElementById('info-year').value;
-    const gender = document.querySelector('input[name="gender"]:checked');
-    const region = document.querySelector('input[name="region"]:checked');
+    const year           = document.getElementById('info-year').value;
+    const gender         = document.querySelector('input[name="gender"]:checked');
+    const region         = document.querySelector('input[name="region"]:checked');
     const residenceYears = document.getElementById('info-residence-years').value;
-    const job = document.querySelector('input[name="job"]:checked');
-    const phone = document.getElementById('info-phone').value;
+    const job            = document.querySelector('input[name="job"]:checked');
+    const phone          = document.getElementById('info-phone').value;
 
-    if (!year)          { alert('출생연도를 입력해주세요.');   return; }
-    if (!gender)        { alert('성별을 선택해주세요.');        return; }
-    if (!region)        { alert('거주지역을 선택해주세요.');    return; }
-    if (!residenceYears){ alert('거주기간을 입력해주세요.');    return; }
-    if (!job)           { alert('직업을 선택해주세요.');        return; }
-    if (!phone)         { alert('휴대폰 번호를 입력해주세요.'); return; }
+    if (!year)           { alert('출생연도를 입력해주세요.');   return; }
+    if (!gender)         { alert('성별을 선택해주세요.');        return; }
+    if (!region)         { alert('거주지역을 선택해주세요.');    return; }
+    if (!residenceYears) { alert('거주기간을 입력해주세요.');    return; }
+    if (!job)            { alert('직업을 선택해주세요.');        return; }
+    if (!phone)          { alert('휴대폰 번호를 입력해주세요.'); return; }
 
     let allFilled = true;
     document.querySelectorAll('.reason-input').forEach(input => {
@@ -1002,6 +1064,7 @@
     }, 1000);
   }
 
+  // ─── 이전/다음 버튼 ──────────────────────────────────────────────
   document.getElementById('next-btn').addEventListener('click', () => {
     if (!used.some(v => !v)) return;
     let idx = currentQIdx, safety = 0;
@@ -1020,13 +1083,17 @@
     showCurrentCard();
   });
 
+  // ─── 줌 컨트롤 ───────────────────────────────────────────────────
   document.getElementById('zoom-in-btn').addEventListener('click', () => {
-    scale = Math.min(scale + 0.1, 1.1); updateScale();
+    scale = Math.min(scale + 0.1, 1.1);
+    updateScale();
   });
   document.getElementById('zoom-out-btn').addEventListener('click', () => {
-    scale = Math.max(scale - 0.1, 0.6); updateScale();
+    scale = Math.max(scale - 0.1, 0.6);
+    updateScale();
   });
 
+  // 핀치 줌 (두 손가락)
   document.addEventListener('touchstart', function(e) {
     if (e.touches.length === 2) {
       lastScale = scale;
@@ -1051,13 +1118,14 @@
 
   function updateScale() {
     const wrapper = document.getElementById('pyramid-zoom-wrapper');
-    const inner = document.querySelector('.board-inner');
-    const scaledHeight = wrapper.offsetHeight * scale;
+    const inner   = document.querySelector('.board-inner');
     wrapper.style.transformOrigin = "top center";
     wrapper.style.transform = `scale(${scale})`;
+    const scaledHeight = wrapper.offsetHeight * scale;
     inner.style.height = (scaledHeight + 50) + "px";
   }
 
+  // ─── 초기 실행 ───────────────────────────────────────────────────
   showCurrentCard();
 </script>
 </body>
