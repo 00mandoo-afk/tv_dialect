@@ -631,6 +631,10 @@
           <label><input type="radio" name="region" value="부산"> 부산</label>
           <label><input type="radio" name="region" value="울산"> 울산</label>
           <label><input type="radio" name="region" value="경남"> 경남</label>
+       <label><input type="radio" name="region" value="그외"> 그 외 지역</label>
+  <input type="text" id="info-region-etc" placeholder="지역 입력"
+         style="width:100px; border:1px solid #ddd; padding:5px; border-radius:4px;">
+
         </td>
       </tr>
       <tr>
@@ -1050,9 +1054,12 @@
     document.querySelectorAll('.slot.occupied .q-card').forEach(c => {
       sortData += `${c.textContent.split('.')[0]}:${c.parentElement.parentElement.dataset.score}, `;
     });
-
+const regionEtc = document.getElementById('info-region-etc').value;
+const regionValue = region.value === '그외' && regionEtc
+  ? `그외(${regionEtc})`
+  : region.value;
     const personalInfo =
-      `출생:19${year} / 성별:${gender.value} / 거주지역:${region.value} / ` +
+      `출생:19${year} / 성별:${gender.value} / 거주지역:${regionValue} / ` +
       `거주기간:${residenceYears}년 / 직업:${job.value}(${document.getElementById('info-job-etc').value}) / ` +
       `연락처:${phone}`;
 
