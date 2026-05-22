@@ -1131,13 +1131,15 @@ const regionValue = region.value === '그외' && regionEtc
   }, { passive: false });
 
   function updateScale() {
-    const wrapper = document.getElementById('pyramid-zoom-wrapper');
-    const inner   = document.querySelector('.board-inner');
-    wrapper.style.transformOrigin = "top center";
-    wrapper.style.transform = `scale(${scale})`;
-    const scaledHeight = wrapper.offsetHeight * scale;
-    inner.style.height = (scaledHeight + 50) + "px";
-  }
+  const wrapper = document.getElementById('pyramid-zoom-wrapper');
+  const inner   = document.querySelector('.board-inner');
+  wrapper.style.transformOrigin = "top center";
+  wrapper.style.transform = `scale(${scale})`;
+  const scaledWidth  = wrapper.offsetWidth  * scale;
+  const scaledHeight = wrapper.offsetHeight * scale;
+  inner.style.width  = scaledWidth + 'px';
+  inner.style.height = (scaledHeight + 50) + 'px';
+}
 
   // ─── 초기 실행 ───────────────────────────────────────────────────
   showCurrentCard();
