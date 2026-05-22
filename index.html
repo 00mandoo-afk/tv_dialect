@@ -1152,6 +1152,16 @@ function updateScale() {
 }
 
   // ─── 초기 실행 ───────────────────────────────────────────────────
+   window.addEventListener('load', () => {
+    const wrapper = document.getElementById('pyramid-zoom-wrapper');
+    const boardWrapper = document.querySelector('.board-wrapper');
+    const naturalWidth = wrapper.offsetWidth;
+    const availableWidth = boardWrapper.clientWidth - 40;
+    const autoScale = Math.min(availableWidth / naturalWidth, 1.0);
+    scale = Math.max(autoScale, 0.4);
+    updateScale();
+  });
+
   showCurrentCard();
 </script>
 </body>
